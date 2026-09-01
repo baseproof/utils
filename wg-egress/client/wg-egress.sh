@@ -367,7 +367,8 @@ cmd_run() {
     # never touches it — but it does need the interface to exist first.
     if ! nc -z -G 3 -w 3 "$ip" "$port" 2>/dev/null; then
       ifconfig "$(utun)" 2>/dev/null | grep -q "$ip" && {
-        log "starting tinyproxy on $ip:$port"
+          log "starting tinyproxy on $ip:$port"
+        pkill -f "tinyproxy -c $BREW/etc/tinyproxy" 2>/dev/null || true
         tinyproxy -c "$BREW/etc/tinyproxy/tinyproxy.conf" 2>/dev/null || true
       }
     fi
@@ -404,8 +405,31 @@ install_daemon() {
 </plist>
 EOF
   chown root:wheel "$PLIST"; chmod 644 "$PLIST"
+  plutil -lint "$PLIST" >/dev/null || { echo "generated plist is invalid" >&2; return 1; }
+
+  # bootout is asynchronous. Bootstrapping before the old job has finished
+  # unloading returns EIO ("Bootstrap failed: 5"), which leaves nothing
+  # loaded at all — so wait for it to actually disappear.
   launchctl bootout system/"$LABEL" 2>/dev/null || true
-  launchctl bootstrap system "$PLIST"
+  for _ in $(seq 1 30); do
+    launchctl print system/"$LABEL" >/dev/null 2>&1 || break
+    sleep 0.5
+  done
+
+  # Any tinyproxy left from a previous run is bound to an address that may no
+  # longer exist; the supervisor starts its own.
+  pkill -f "tinyproxy -c $BREW/etc/tinyproxy" 2>/dev/null || true
+
+  local rc=1
+  for attempt in 1 2 3; do
+    if launchctl bootstrap system "$PLIST" 2>/dev/null; then rc=0; break; fi
+    log "bootstrap attempt $attempt failed, retrying"
+    sleep 2
+  done
+  if (( rc != 0 )); then
+    echo "could not load $LABEL — try: sudo launchctl bootstrap system $PLIST" >&2
+    return 1
+  fi
   pmset -a sleep 0 disablesleep 1 || true
   log "daemon installed; starts at boot with no login"
 }
