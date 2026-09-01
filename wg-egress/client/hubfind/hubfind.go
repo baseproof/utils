@@ -4,10 +4,10 @@
 // keeps proving it. Every discovery source is treated as fallible, including
 // DNS-over-HTTPS, which consumer routers routinely block.
 //
-//   go mod init hubfind
-//   go get golang.zx2c4.com/wireguard/wgctrl
-//   go build -o hubfind .
-//   sudo ./hubfind -config /usr/local/etc/wg-egress/hubfind.json
+//	go mod init hubfind
+//	go get golang.zx2c4.com/wireguard/wgctrl
+//	go build -o hubfind .
+//	sudo ./hubfind -config /usr/local/etc/wg-egress/hubfind.json
 //
 // Runs as root: it reads and writes the WireGuard device.
 package main
@@ -47,14 +47,14 @@ const (
 )
 
 type Config struct {
-	Interface   string   `json:"interface"`       // wg0
-	HubDomain   string   `json:"hub_domain"`      // hub.example.com
-	HubTXT      string   `json:"hub_txt"`         // _hub.example.com, optional
-	HubPort     int      `json:"hub_port"`        // 51820
-	HubPubkey   string   `json:"hub_public_key"`  // base64 wg key
-	HubTunnelIP string   `json:"hub_tunnel_ip"`   // 10.88.0.1
-	ControlPort int      `json:"control_port"`    // 8080
-	Seeds       []string `json:"seeds"`           // "34.28.11.5:51820", last-resort
+	Interface   string   `json:"interface"`      // wg0
+	HubDomain   string   `json:"hub_domain"`     // hub.example.com
+	HubTXT      string   `json:"hub_txt"`        // _hub.example.com, optional
+	HubPort     int      `json:"hub_port"`       // 51820
+	HubPubkey   string   `json:"hub_public_key"` // base64 wg key
+	HubTunnelIP string   `json:"hub_tunnel_ip"`  // 10.88.0.1
+	ControlPort int      `json:"control_port"`   // 8080
+	Seeds       []string `json:"seeds"`          // "34.28.11.5:51820", last-resort
 	StateDir    string   `json:"state_dir"`
 }
 

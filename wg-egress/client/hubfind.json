@@ -3,9 +3,11 @@
   "hub_domain": "hub.baseproof.net",
   "hub_txt": "_hub.baseproof.net",
   "hub_port": 51820,
-  "hub_public_key": "irayR4YCD4cQpFbvR2c0ZeU8CC9PgsOPYnJiTNQzJUo=",
+  "hub_public_key": "REPLACE: sudo wg show wg0 public-key on the hub",
   "hub_tunnel_ip": "10.88.0.1",
   "control_port": 8080,
-  "seeds": ["34.72.191.179:51820"],
+  "seeds": [
+    "34.72.191.179:51820"
+  ],
   "state_dir": "/usr/local/etc/wg-egress"
 }

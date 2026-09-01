@@ -1,6 +1,6 @@
 # Build targets for the WireGuard egress fleet.
 ZONE ?= us-central1-a
-VM   ?= hub-ip
+VM   ?= wg-hub
 
 .PHONY: all hubd hubfind test clean deploy-hub hub-up
 
@@ -39,5 +39,4 @@ hub-up:
 		else git clone git@github.com:baseproof/utils.git ~/utils; fi; \
 		sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq ansible >/dev/null; \
 		sudo ansible-playbook -i localhost, -c local \
-			-e src_dir=$$HOME/utils/wg-egress/hub \
 			$$HOME/utils/wg-egress/hub/ansible/playbook.yml'

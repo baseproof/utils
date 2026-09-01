@@ -21,12 +21,18 @@
     wg_port: 51820
     api_port: 8080
     go_version: "1.23.4"
-    src_dir: /opt/utils/wg-egress/hub
+    # Resolves relative to this file, so the repo can be cloned anywhere.
+    src_dir: "{{ playbook_dir }}/.."
 
   handlers:
     - name: restart caddy
       ansible.builtin.systemd:
         name: caddy
+        state: restarted
+
+    - name: restart journald
+      ansible.builtin.systemd:
+        name: systemd-journald
         state: restarted
 
     - name: restart hubd
@@ -114,14 +120,26 @@
 
     # ---------------------------------------------------------- caddy
 
+    - name: Fetch the Caddy signing key
+      ansible.builtin.get_url:
+        url: https://dl.cloudsmith.io/public/caddy/stable/gpg.key
+        dest: /etc/apt/caddy.asc
+        mode: "0644"
+
+    - name: Dearmor the Caddy signing key
+      ansible.builtin.shell:
+        cmd: gpg --batch --yes --dearmor -o /usr/share/keyrings/caddy-stable.gpg /etc/apt/caddy.asc
+        creates: /usr/share/keyrings/caddy-stable.gpg
+
+    # deb822_repository is the modern form but needs ansible-core >= 2.15;
+    # Debian 12 packages ansible-core 2.14, so use apt_repository, which works
+    # on both and is not removed until 2.25.
     - name: Add the Caddy repository
-      ansible.builtin.deb822_repository:
-        name: caddy-stable
-        types: [deb]
-        uris: https://dl.cloudsmith.io/public/caddy/stable/deb/debian
-        suites: any-version
-        components: [main]
-        signed_by: https://dl.cloudsmith.io/public/caddy/stable/gpg.key
+      ansible.builtin.apt_repository:
+        repo: >-
+          deb [signed-by=/usr/share/keyrings/caddy-stable.gpg]
+          https://dl.cloudsmith.io/public/caddy/stable/deb/debian any-version main
+        filename: caddy-stable
         state: present
 
     - name: Install Caddy
@@ -202,6 +220,7 @@
       loop:
         - { path: /var/lib/hubd, mode: "0700" }
         - { path: /etc/hubd, mode: "0700" }
+        - { path: /etc/systemd/journald.conf.d, mode: "0755" }
 
     # Requires= matters: hubd exits at startup if wg0 is absent, so without the
     # ordering it crash-loops through a reboot until systemd gives up.
@@ -219,10 +238,28 @@
           ExecStart=/usr/local/bin/hubd serve -endpoint {{ domain }}:{{ wg_port }} -listen :{{ api_port }}
           Restart=always
           RestartSec=5
+          TimeoutStopSec=15
+          NoNewPrivileges=true
+          PrivateTmp=true
+          ProtectHome=true
+          ProtectSystem=full
+          ProtectKernelTunables=true
+          RestrictSUIDSGID=true
+          LockPersonality=true
 
           [Install]
           WantedBy=multi-user.target
       notify: restart hubd
+
+    - name: Rotate tinyproxy-style logs is client-side; hub logs go to journald
+      ansible.builtin.copy:
+        dest: /etc/systemd/journald.conf.d/hubd.conf
+        mode: "0644"
+        content: |
+          [Journal]
+          SystemMaxUse=200M
+          MaxRetentionSec=30day
+      notify: restart journald
 
     - name: Create the enrollment key
       ansible.builtin.command: /usr/local/bin/hubd enroll-key
@@ -255,6 +292,18 @@
           would point clients at the wrong hub.
         success_msg: "hub key {{ wg_public.stdout }} confirmed"
 
+    - name: Read this VM's external address
+      ansible.builtin.uri:
+        url: "{{ md }}/instance/network-interfaces/0/access-configs/0/external-ip"
+        headers:
+          Metadata-Flavor: Google
+        return_content: true
+      register: ext
+      changed_when: false
+      failed_when: false
+      vars:
+        md: http://metadata.google.internal/computeMetadata/v1
+
     - name: Report
       ansible.builtin.debug:
         msg:
@@ -262,3 +311,10 @@
           - "hub key    {{ wg_public.stdout }}"
           - "enroll key /etc/hubd/enroll.key  (root credential — back this up)"
           - "next       hubd join-token -node macmini-garage -class egress -ttl 1h"
+          - ""
+          - "If this is a NEW vm the published key is now stale. Update DNS:"
+          - >-
+            gcloud dns record-sets update _hub.{{ domain.split('.')[1:] | join('.') }}.
+            --zone=<zone> --type=TXT --ttl=60
+            --rrdatas='"v=1 ep={{ ext.content | default("<ip>") | trim }}:{{ wg_port }}
+            pri=10 pk={{ wg_public.stdout }}"' 

@@ -7,18 +7,19 @@
 // Clients generate their own keypair and send only the public half. This
 // service never sees, transmits, or stores a client private key.
 //
-//   go mod init hubd
-//   go get golang.zx2c4.com/wireguard/wgctrl modernc.org/sqlite
-//   go build -o hubd .
+//	go mod init hubd
+//	go get golang.zx2c4.com/wireguard/wgctrl modernc.org/sqlite
+//	go build -o hubd .
 //
-//   ./hubd token --class egress --note "mac mini, garage"
-//   ./hubd serve --endpoint hub.example.com:51820
+//	./hubd token --class egress --note "mac mini, garage"
+//	./hubd serve --endpoint hub.example.com:51820
 //
 // Public surface is POST /v1/enroll only. Everything else requires a source
 // address inside the tunnel CIDR plus the client's bearer token.
 package main
 
 import (
+	"context"
 	"crypto/hmac"
 	"crypto/rand"
 	"crypto/sha256"
@@ -33,14 +34,16 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"strings"
 	"sync"
+	"syscall"
 	"time"
 
-	_ "modernc.org/sqlite"
 	"golang.zx2c4.com/wireguard/wgctrl"
 	"golang.zx2c4.com/wireguard/wgctrl/wgtypes"
+	_ "modernc.org/sqlite"
 )
 
 const (
@@ -58,7 +61,7 @@ type Hub struct {
 	hubIP    net.IP
 	hubPub   string
 	proxyPt  int
-	joinKey  []byte // the single enrollment key
+	joinKey  []byte     // the single enrollment key
 	mu       sync.Mutex // serialises IP allocation
 }
 
@@ -78,7 +81,6 @@ CREATE TABLE IF NOT EXISTS peers (
 );
 CREATE INDEX IF NOT EXISTS peers_class ON peers(class) WHERE revoked_at IS NULL;
 `
-
 
 // ------------------------------------------------- enrollment key + join tokens
 
@@ -405,7 +407,7 @@ func (h *Hub) handleEnroll(w http.ResponseWriter, r *http.Request) {
 		ServerPubkey: h.hubPub, ServerEndpoint: h.endpoint,
 		ControlURL: "http://" + h.hubIP.String() + ":8080",
 		AuthToken:  authTok, ProxyPort: h.proxyPt,
-		Keepalive:  int(keepalive.Seconds()), Reenrolled: reenroll,
+		Keepalive: int(keepalive.Seconds()), Reenrolled: reenroll,
 	})
 }
 
@@ -661,8 +663,38 @@ func main() {
 		Handler:           mux,
 		ReadHeaderTimeout: 10 * time.Second,
 		WriteTimeout:      20 * time.Second,
+		IdleTimeout:       120 * time.Second,
 	}
-	log.Printf("hubd on %s | device %s | pubkey %s | endpoint %s",
-		*listen, *device, h.hubPub, h.endpoint)
-	log.Fatal(srv.ListenAndServe())
+
+	// Shut down cleanly on SIGTERM so a systemd restart or a deploy does not
+	// cut an enrollment mid-flight, between the peer insert and the device
+	// write. Tunnels are unaffected either way — they live in the kernel, not
+	// in this process.
+	errc := make(chan error, 1)
+	go func() {
+		log.Printf("hubd on %s | device %s | pubkey %s | endpoint %s",
+			*listen, *device, h.hubPub, h.endpoint)
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			errc <- err
+		}
+	}()
+
+	sigc := make(chan os.Signal, 1)
+	signal.Notify(sigc, syscall.SIGINT, syscall.SIGTERM)
+
+	select {
+	case err := <-errc:
+		log.Fatal(err)
+	case sig := <-sigc:
+		log.Printf("received %s, draining", sig)
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		if err := srv.Shutdown(ctx); err != nil {
+			log.Printf("shutdown: %v", err)
+		}
+		if err := db.Close(); err != nil {
+			log.Printf("db close: %v", err)
+		}
+		log.Print("stopped")
+	}
 }

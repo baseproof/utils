@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"encoding/base64"
+	"net"
 	"testing"
 	"time"
 )
@@ -26,8 +28,8 @@ func TestRankingPrefersProvenEndpoints(t *testing.T) {
 	a := &Agent{state: map[string]*EPState{}}
 	a.stateFor("10.0.0.1:51820").LastOK = now.Add(-2 * time.Minute) // just worked
 	a.stateFor("10.0.0.1:51820").LatencyMS = 40
-	a.stateFor("10.0.0.2:51820").LastOK = now.Add(-30 * time.Hour)  // worked long ago
-	s3 := a.stateFor("10.0.0.3:51820")                              // failing now
+	a.stateFor("10.0.0.2:51820").LastOK = now.Add(-30 * time.Hour) // worked long ago
+	s3 := a.stateFor("10.0.0.3:51820")                             // failing now
 	s3.ConsecFail = 3
 	s3.CooldownUntil = now.Add(4 * time.Minute)
 
@@ -117,11 +119,17 @@ func TestLiveBaseproofRecord(t *testing.T) {
 				t.Fatalf("%s: failed to parse %q", p.name, r)
 			}
 			t.Logf("%-10s ep=%s pri=%d pk=%s", p.name, h.Endpoint, h.Priority, h.Pubkey)
-			if h.Endpoint != "34.72.191.179:51820" || h.Priority != 10 {
-				t.Fatalf("unexpected parse: %+v", h)
+			// Assert shape, not a specific value — the key changes whenever the
+			// hub VM is rebuilt, and a test that pins it fails on every rotation.
+			if _, _, err := net.SplitHostPort(h.Endpoint); err != nil {
+				t.Fatalf("endpoint %q is not host:port: %v", h.Endpoint, err)
 			}
-			if h.Pubkey != "irayR4YCD4cQpFbvR2c0ZeU8CC9PgsOPYnJiTNQzJUo=" {
-				t.Fatalf("pubkey mangled — trailing '=' lost? got %q", h.Pubkey)
+			raw, err := base64.StdEncoding.DecodeString(h.Pubkey)
+			if err != nil || len(raw) != 32 {
+				t.Fatalf("pk is not a 32-byte base64 wireguard key: %q (%v)", h.Pubkey, err)
+			}
+			if h.Priority <= 0 {
+				t.Fatalf("priority missing or non-positive: %d", h.Priority)
 			}
 		}
 	}

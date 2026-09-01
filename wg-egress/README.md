@@ -16,19 +16,20 @@ NAT and carrier-grade NAT both work untouched.
 
 | Thing | Value |
 | --- | --- |
-| Hub VM | `hub-ip`, zone `us-central1-a`, project `legalai-460612` |
+| Hub VM | `wg-hub`, zone `us-central1-a`, project `legalai-460612` |
 | Hub address | `34.72.191.179` (reserved as `hub-ip`) |
 | Hostname | `hub.baseproof.net` |
 | Discovery record | `_hub.baseproof.net` TXT |
-| Hub WireGuard key | `irayR4YCD4cQpFbvR2c0ZeU8CC9PgsOPYnJiTNQzJUo=` |
+| Hub WireGuard key | regenerated per VM — read it off the host, never assume |
 | Cloud DNS zone | `baseproof-net` |
 
-Done: static IP, VM with `--can-ip-forward`, firewall (`wg-hub` tag),
-WireGuard `wg0` at `10.88.0.1/16`, A record, TXT record, Caddy with a valid
-certificate.
+Static IP, firewall (`wg-hub` tag), A record and TXT record are in place and
+survive VM replacement. Everything on the host itself — WireGuard, Caddy,
+`hubd` — is rebuilt from scratch by the playbook on each new VM.
 
-Not done: `hubd` is not deployed. `https://hub.baseproof.net/healthz` returns
-502 until it is — that 502 is Caddy proxying to a port nothing listens on.
+A 502 from `/healthz` means Caddy is up but `hubd` is not listening; check
+`journalctl -u hubd`. A connection refused means Caddy is down or DNS is
+pointing elsewhere.
 
 ## Layout
 
@@ -70,11 +71,21 @@ One-time setup:
 
 ```bash
 gcloud services enable secretmanager.googleapis.com
-gcloud secrets create gh-deploy-key --data-file=./gh_deploy   # private half of a READ-ONLY deploy key
+
+# tr -d '\n' matters: gh emits a trailing newline that corrupts the token
+gh auth refresh -h github.com -s repo -s read:packages -s write:packages
+gh auth token | tr -d '\n' | gcloud secrets create gh-token --data-file=-
+
 PROJECT_NUM=$(gcloud projects describe legalai-460612 --format='value(projectNumber)')
-gcloud secrets add-iam-policy-binding gh-deploy-key \
+gcloud secrets add-iam-policy-binding gh-token \
   --member="serviceAccount:$PROJECT_NUM-compute@developer.gserviceaccount.com" \
   --role=roles/secretmanager.secretAccessor
+```
+
+Rotate by adding a version, not replacing the secret:
+
+```bash
+gh auth token | tr -d '\n' | gcloud secrets versions add gh-token --data-file=-
 ```
 
 Then the VM provisions itself:
@@ -128,15 +139,15 @@ make deploy-hub
 curl -s https://hub.baseproof.net/healthz
 ```
 
-Expect `{"ok":true,"hub_pubkey":"irayR4YCD4cQpFbvR2c0ZeU8CC9PgsOPYnJiTNQzJUo="}`.
-The key matching the TXT record confirms the control plane is reading the same
-device you published.
+Expect `{"ok":true,"hub_pubkey":"<the key wg0 holds>"}`. It matching your
+TXT record is what confirms the control plane and DNS agree about which hub
+this is.
 
 ## Add a Mac
 
 ```bash
 # on the hub
-gcloud compute ssh hub-ip --zone=us-central1-a --tunnel-through-iap \
+gcloud compute ssh wg-hub --zone=us-central1-a --tunnel-through-iap \
   --command 'sudo hubd join-token -node macmini-garage -class egress -ttl 1h'
 
 # on the Mac
