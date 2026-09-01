@@ -1,0 +1,10 @@
+build/
+*.zip
+*.pem
+*.key
+*.db
+hubd
+hubfind-*
+identity.json
+join.token
+hubfind-state.json
