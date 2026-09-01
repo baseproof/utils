@@ -2,7 +2,7 @@
 ZONE ?= us-central1-a
 VM   ?= hub-ip
 
-.PHONY: all hubd hubfind test clean deploy-hub
+.PHONY: all hubd hubfind test clean deploy-hub hub-up
 
 all: hubd hubfind
 
@@ -31,3 +31,13 @@ deploy-hub: hubd
 
 clean:
 	rm -rf build
+
+## hub-up — pull the repo on the VM and converge it with ansible
+hub-up:
+	gcloud compute ssh $(VM) --zone=$(ZONE) --tunnel-through-iap --ssh-flag=-A --command 'set -e; \
+		if [ -d ~/utils/.git ]; then git -C ~/utils pull --ff-only; \
+		else git clone git@github.com:baseproof/utils.git ~/utils; fi; \
+		sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq ansible >/dev/null; \
+		sudo ansible-playbook -i localhost, -c local \
+			-e src_dir=$$HOME/utils/wg-egress/hub \
+			$$HOME/utils/wg-egress/hub/ansible/playbook.yml'

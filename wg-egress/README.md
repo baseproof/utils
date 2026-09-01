@@ -32,22 +32,94 @@ Not done: `hubd` is not deployed. `https://hub.baseproof.net/healthz` returns
 
 ## Layout
 
+Each side owns its own provisioning; `infra/` is cloud resources only.
+
 ```
-hub/                 control plane, runs on the GCP VM
+hub/                 everything that runs on the GCP VM
   hubd.go            enrollment, IP allocation, live peer programming
-  hubd.service       systemd unit
-  Caddyfile          TLS termination for the enrollment endpoint
-  wg0.conf.example   the interface hubd expects to already exist
-client/
-  wg-egress.sh       macOS installer + reconnect supervisor
+  ansible/
+    playbook.yml     all hub configuration, declarative and idempotent
+  startup.sh         GCP startup metadata; fetches a key, runs ansible-pull
+client/              everything that runs on a Mac
+  wg-egress.sh       installer + reconnect supervisor
   hubfind.json       agent config, filled in for this deployment
   hubfind/
     hubfind.go       hub discovery and failover agent
     hubfind_test.go  parsing, ranking, circuit breaker, live DNS
-infra/
-  gcp-hub-setup.sh   one-shot infrastructure (idempotent)
+infra/               cloud resources, not host configuration
+  gcp-hub-setup.sh   IP, firewall, VM, DNS
   gcp-publish-endpoint.sh   re-announce the hub IP from a rebuilt VM
 ```
+
+The Caddyfile, systemd unit and `wg0.conf` are not checked in — the playbook
+is their single source. Keeping copies alongside it only lets them drift.
+
+## Provisioning
+
+Configuration is an Ansible playbook (`hub/ansible/playbook.yml`), not a script.
+It is idempotent: re-running after a code change rebuilds and restarts, and
+changes nothing else.
+
+Two ways to run it.
+
+**Zero-touch at VM creation.** `hub/startup.sh` is injected as startup
+metadata; it fetches a read-only deploy key from Secret Manager and hands off
+to `ansible-pull`. Twenty lines, none of them configuration.
+
+One-time setup:
+
+```bash
+gcloud services enable secretmanager.googleapis.com
+gcloud secrets create gh-deploy-key --data-file=./gh_deploy   # private half of a READ-ONLY deploy key
+PROJECT_NUM=$(gcloud projects describe legalai-460612 --format='value(projectNumber)')
+gcloud secrets add-iam-policy-binding gh-deploy-key \
+  --member="serviceAccount:$PROJECT_NUM-compute@developer.gserviceaccount.com" \
+  --role=roles/secretmanager.secretAccessor
+```
+
+Then the VM provisions itself:
+
+```bash
+gcloud compute instances create wg-hub \
+  --zone=us-central1-a --machine-type=e2-small \
+  --image-family=debian-12 --image-project=debian-cloud \
+  --address=hub-ip --can-ip-forward --tags=wg-hub \
+  --scopes=cloud-platform \
+  --metadata-from-file=startup-script=wg-egress/hub/startup.sh
+```
+
+`--scopes=cloud-platform` is required for Secret Manager access and cannot be
+changed on a running instance.
+
+Watch it converge:
+
+```bash
+gcloud compute ssh wg-hub --zone=us-central1-a --tunnel-through-iap \
+  --command 'sudo journalctl -u google-startup-scripts -f'
+```
+
+**Against an existing VM**, from your Mac:
+
+```bash
+make hub-up
+```
+
+### A new VM means a new hub key
+
+The playbook generates the WireGuard private key once and never regenerates
+it, so re-running is safe. But a *fresh* VM has no key to preserve and will
+mint a new one — which invalidates the `pk=` in your published TXT record.
+After creating a replacement hub:
+
+```bash
+HUB_PK=$(gcloud compute ssh wg-hub --zone=us-central1-a --tunnel-through-iap \
+  --command 'sudo wg show wg0 public-key' | tr -d '\r' | tail -n1)
+gcloud dns record-sets update _hub.baseproof.net. --zone=baseproof-net \
+  --type=TXT --ttl=60 --rrdatas="\"v=1 ep=34.72.191.179:51820 pri=10 pk=$HUB_PK\""
+```
+
+Enrolled nodes will not reconnect until that record matches, because their
+configured peer key no longer exists on the hub.
 
 ## Finish the deployment
 

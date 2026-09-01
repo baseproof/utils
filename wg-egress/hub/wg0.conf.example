@@ -1,6 +1,0 @@
-# /etc/wireguard/wg0.conf on the hub — chmod 600
-# hubd manages peers on top of this; it never creates the interface.
-[Interface]
-Address = 10.88.0.1/16
-ListenPort = 51820
-PrivateKey = <output of: wg genkey>

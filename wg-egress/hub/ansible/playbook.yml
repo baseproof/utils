@@ -1,0 +1,264 @@
+---
+# wg-egress/hub/ansible/playbook.yml
+#
+# Provisions the WireGuard hub. Run by ansible-pull from the VM's startup
+# metadata, or by hand:
+#
+#   ansible-playbook -i localhost, -c local wg-egress/hub/ansible/playbook.yml
+#
+# Idempotent throughout. The hub's WireGuard private key is generated once and
+# never regenerated — its public half is published in DNS, so rotating it
+# silently would strand every enrolled node.
+
+- name: WireGuard egress hub
+  hosts: all
+  become: true
+  gather_facts: true
+
+  vars:
+    domain: hub.baseproof.net
+    tunnel_cidr: 10.88.0.1/16
+    wg_port: 51820
+    api_port: 8080
+    go_version: "1.23.4"
+    src_dir: /opt/utils/wg-egress/hub
+
+  handlers:
+    - name: restart caddy
+      ansible.builtin.systemd:
+        name: caddy
+        state: restarted
+
+    - name: restart hubd
+      ansible.builtin.systemd:
+        name: hubd
+        state: restarted
+        daemon_reload: true
+
+  tasks:
+
+    # ---------------------------------------------------------- packages
+
+    - name: Install base packages
+      ansible.builtin.apt:
+        name:
+          - wireguard
+          - iptables
+          - git
+          - curl
+          - jq
+          - gnupg
+          - debian-keyring
+          - debian-archive-keyring
+          - apt-transport-https
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+
+    # ---------------------------------------------------------- forwarding
+
+    # Peers reach each other through this box. Without forwarding their
+    # traffic is dropped silently — no error on either end.
+    - name: Enable IP forwarding
+      ansible.posix.sysctl:
+        name: "{{ item }}"
+        value: "1"
+        sysctl_file: /etc/sysctl.d/99-wg-hub.conf
+        sysctl_set: true
+        reload: true
+      loop:
+        - net.ipv4.ip_forward
+        - net.ipv6.conf.all.forwarding
+
+    # ---------------------------------------------------------- wireguard
+
+    - name: Ensure /etc/wireguard exists
+      ansible.builtin.file:
+        path: /etc/wireguard
+        state: directory
+        mode: "0700"
+
+    - name: Generate the hub private key, once and only once
+      ansible.builtin.shell:
+        cmd: umask 077 && wg genkey > /etc/wireguard/private.key
+        creates: /etc/wireguard/private.key
+
+    - name: Read the hub private key
+      ansible.builtin.slurp:
+        src: /etc/wireguard/private.key
+      register: wg_private
+      no_log: true
+
+    - name: Write wg0.conf
+      ansible.builtin.copy:
+        dest: /etc/wireguard/wg0.conf
+        mode: "0600"
+        content: |
+          # managed by ansible — hubd adds and removes peers at runtime
+          [Interface]
+          Address = {{ tunnel_cidr }}
+          ListenPort = {{ wg_port }}
+          PrivateKey = {{ wg_private.content | b64decode | trim }}
+      no_log: true
+
+    - name: Bring up wg0
+      ansible.builtin.systemd:
+        name: wg-quick@wg0
+        state: started
+        enabled: true
+
+    - name: Read the hub public key
+      ansible.builtin.command: wg show wg0 public-key
+      register: wg_public
+      changed_when: false
+
+    # ---------------------------------------------------------- caddy
+
+    - name: Add the Caddy repository
+      ansible.builtin.deb822_repository:
+        name: caddy-stable
+        types: [deb]
+        uris: https://dl.cloudsmith.io/public/caddy/stable/deb/debian
+        suites: any-version
+        components: [main]
+        signed_by: https://dl.cloudsmith.io/public/caddy/stable/gpg.key
+        state: present
+
+    - name: Install Caddy
+      ansible.builtin.apt:
+        name: caddy
+        state: present
+        update_cache: true
+
+    # Caddy terminates TLS for enrollment. Requests arriving this way have a
+    # loopback source address, so hubd's tunnel-only check rejects the admin
+    # routes automatically — enrollment works publicly, administration does not.
+    - name: Configure Caddy
+      ansible.builtin.copy:
+        dest: /etc/caddy/Caddyfile
+        mode: "0644"
+        content: |
+          {{ domain }} {
+          	reverse_proxy 127.0.0.1:{{ api_port }}
+          }
+      notify: restart caddy
+
+    - name: Enable Caddy
+      ansible.builtin.systemd:
+        name: caddy
+        state: started
+        enabled: true
+
+    # ---------------------------------------------------------- go
+
+    - name: Check the installed Go version
+      ansible.builtin.command: /usr/local/go/bin/go version
+      register: go_installed
+      changed_when: false
+      failed_when: false
+
+    - name: Download Go
+      ansible.builtin.get_url:
+        url: "https://go.dev/dl/go{{ go_version }}.linux-amd64.tar.gz"
+        dest: "/tmp/go{{ go_version }}.tar.gz"
+        mode: "0644"
+      when: "'go' + go_version not in (go_installed.stdout | default(''))"
+
+    - name: Install Go
+      ansible.builtin.unarchive:
+        src: "/tmp/go{{ go_version }}.tar.gz"
+        dest: /usr/local
+        remote_src: true
+      when: "'go' + go_version not in (go_installed.stdout | default(''))"
+
+    # ---------------------------------------------------------- build
+
+    - name: Build hubd
+      ansible.builtin.command:
+        cmd: /usr/local/go/bin/go build -o /tmp/hubd .
+        chdir: "{{ src_dir }}"
+      environment:
+        HOME: /root
+        GOCACHE: /root/.cache/go-build
+      changed_when: false
+
+    # Comparing the built artifact against what is installed is what makes a
+    # re-run a no-op when the source has not changed.
+    - name: Install hubd
+      ansible.builtin.copy:
+        src: /tmp/hubd
+        dest: /usr/local/bin/hubd
+        mode: "0755"
+        remote_src: true
+      notify: restart hubd
+
+    # ---------------------------------------------------------- control plane
+
+    - name: Create hubd directories
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: directory
+        mode: "{{ item.mode }}"
+      loop:
+        - { path: /var/lib/hubd, mode: "0700" }
+        - { path: /etc/hubd, mode: "0700" }
+
+    # Requires= matters: hubd exits at startup if wg0 is absent, so without the
+    # ordering it crash-loops through a reboot until systemd gives up.
+    - name: Install the hubd unit
+      ansible.builtin.copy:
+        dest: /etc/systemd/system/hubd.service
+        mode: "0644"
+        content: |
+          [Unit]
+          Description=WireGuard hub control plane
+          After=network-online.target wg-quick@wg0.service
+          Requires=wg-quick@wg0.service
+
+          [Service]
+          ExecStart=/usr/local/bin/hubd serve -endpoint {{ domain }}:{{ wg_port }} -listen :{{ api_port }}
+          Restart=always
+          RestartSec=5
+
+          [Install]
+          WantedBy=multi-user.target
+      notify: restart hubd
+
+    - name: Create the enrollment key
+      ansible.builtin.command: /usr/local/bin/hubd enroll-key
+      args:
+        creates: /etc/hubd/enroll.key
+
+    - name: Enable hubd
+      ansible.builtin.systemd:
+        name: hubd
+        state: started
+        enabled: true
+        daemon_reload: true
+
+    # ---------------------------------------------------------- verify
+
+    - name: Wait for the control plane
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ api_port }}/healthz"
+        return_content: true
+      register: health
+      retries: 15
+      delay: 2
+      until: health.status is defined and health.status == 200
+
+    - name: Confirm the control plane reports the live device key
+      ansible.builtin.assert:
+        that: wg_public.stdout in health.content
+        fail_msg: >-
+          hubd reports a different key than wg0 holds — the TXT record
+          would point clients at the wrong hub.
+        success_msg: "hub key {{ wg_public.stdout }} confirmed"
+
+    - name: Report
+      ansible.builtin.debug:
+        msg:
+          - "endpoint   {{ domain }}:{{ wg_port }}"
+          - "hub key    {{ wg_public.stdout }}"
+          - "enroll key /etc/hubd/enroll.key  (root credential — back this up)"
+          - "next       hubd join-token -node macmini-garage -class egress -ttl 1h"
