@@ -1,0 +1,1288 @@
+target_url: https://eringcapture.jccal.org/
+parcel_number: 20 00 01 1 001 003.000
+tax_year: '2025'
+model: gemini-3.5-flash-lite
+sdk: google-genai (Vertex AI mode)
+status: completed
+parcel_detail:
+  identity:
+    parcel_number: 20 00 01 1 001 003.000
+    tax_year: '2025'
+    owner: SPRUELL THERON C & SHEILA A
+    property_address:
+      street: 2984 SARTAIN DR
+      city_state_zip: ADAMSVILLE AL 35005
+    mailing_address:
+      street: 758 HIGHCROFT CIR
+      city_state_zip: GARDENDALE AL 35071
+    neighborhood: 03-010.0
+    subdivision: BAILEY & PARRISH 20-1-1
+    book: '53'
+    page: '21'
+    lot: '4'
+    acreage: '0.000'
+    section: '01'
+    township: 17S
+    range: 05W
+  assessment:
+    appraised_value: $122,400
+    tax_year: '2025'
+    property_class: '2'
+    exempt_code: ''
+    municipality: 02 - COUNTY-02
+    school_district: ''
+    disability_code: ''
+    over_65_code: ''
+    total_hc_area: 1000 Sqft
+    metes_and_bounds: LOT 4 BAILEY & PARRISH SUB
+    remarks: 100S X 326S IRR
+  valuation_summary:
+    total_improvement_value: $95,600
+    total_land_value: $26,800
+    total_market_value: $122,400
+    total_appraised_value: $122,400
+    assessed_value: $24,480
+    prior_year_total_improvement_value: $90,800
+    prior_year_total_land_value: $26,800
+    prior_year_total_appraised_value: $117,600
+    bill_number: 5238382 - REAL PROPERTY
+  tax_breakdown:
+    rows:
+    - year: '2025'
+      millage_type: STATE
+      property_class: '2'
+      municipality: 02 - COUNTY-02
+      assessed_value: $24,480
+      tax: $159.12
+      exemption: $0.00
+      tax_exemption: $0.00
+      total_tax: $159.12
+    - year: '2025'
+      millage_type: COUNTY
+      property_class: '2'
+      municipality: 02 - COUNTY-02
+      assessed_value: $24,480
+      tax: $330.48
+      exemption: $0.00
+      tax_exemption: $0.00
+      total_tax: $330.48
+    - year: '2025'
+      millage_type: SCHOOL
+      property_class: '2'
+      municipality: 02 - COUNTY-02
+      assessed_value: $24,480
+      tax: $200.74
+      exemption: $0.00
+      tax_exemption: $0.00
+      total_tax: $200.74
+    - year: '2025'
+      millage_type: DIST SCHOOL
+      property_class: '2'
+      municipality: 02 - COUNTY-02
+      assessed_value: $24,480
+      tax: $0.00
+      exemption: $0.00
+      tax_exemption: $0.00
+      total_tax: $0.00
+    - year: '2025'
+      millage_type: FOREST
+      property_class: '2'
+      municipality: 02 - COUNTY-02
+      assessed_value: $0
+      tax: $0.00
+      exemption: $0.00
+      tax_exemption: $0.00
+      total_tax: $0.00
+    - year: '2025'
+      millage_type: SPC SCHOOL1
+      property_class: '2'
+      municipality: 02 - COUNTY-02
+      assessed_value: $24,480
+      tax: $124.85
+      exemption: $0.00
+      tax_exemption: $0.00
+      total_tax: $124.85
+    - year: '2025'
+      millage_type: SPC SCHOOL2
+      property_class: '2'
+      municipality: 02 - COUNTY-02
+      assessed_value: $24,480
+      tax: $411.26
+      exemption: $0.00
+      tax_exemption: $0.00
+      total_tax: $411.26
+    fees_and_interest: $0.00
+    tax_total: $1,226.45
+    tax_column_total: $1,226.45
+    tax_total_exemption: $0.00
+  tax_payments:
+    current:
+    - tax_year: '2025'
+      paid_by: THERON C SPRUELL SHEILA H SPRUELL
+      paid_date: 12/22/2025
+      receipt_number: '5238382'
+      total_taxes_plus_fees: $1,226.45
+      total_paid: $1,226.45
+    historical:
+    - tax_year: '2024'
+      paid_by: THERON C SPRUELL SHEILA H SPRUELL
+      paid_date: 12/27/2024
+      receipt_number: '5237671'
+      total_taxes_plus_fees: $1,178.35
+      total_paid: $1,178.35
+    - tax_year: '2023'
+      paid_by: SPRUELL THERON C & SHEILA A
+      paid_date: 12/29/2023
+      receipt_number: '5236794'
+      total_taxes_plus_fees: $1,060.12
+      total_paid: $1,060.12
+    - tax_year: '2022'
+      paid_by: SPRUELL THERON C & SHEILA A
+      paid_date: 12/05/2022
+      receipt_number: '5236209'
+      total_taxes_plus_fees: $1,081.16
+      total_paid: $1,081.16
+    - tax_year: '2021'
+      paid_by: SHEILA LYNSEE SPRUELL
+      paid_date: 12/29/2021
+      receipt_number: '5235829'
+      total_taxes_plus_fees: $790.58
+      total_paid: $790.58
+    - tax_year: '2020'
+      paid_by: SPRUELL THERON C & SHELIA ANN
+      paid_date: 12/18/2020
+      receipt_number: '5235502'
+      total_taxes_plus_fees: $818.63
+      total_paid: $818.63
+    - tax_year: '2019'
+      paid_by: Sheila Spruell
+      paid_date: 11/20/2019
+      receipt_number: '5234996'
+      total_taxes_plus_fees: $778.55
+      total_paid: $778.55
+    - tax_year: '2018'
+      paid_by: SPRUELL
+      paid_date: 10/31/2018
+      receipt_number: '5234642'
+      total_taxes_plus_fees: $747.49
+      total_paid: $747.49
+    - tax_year: '2017'
+      paid_by: Sheila Spruell
+      paid_date: 12/12/2017
+      receipt_number: '5233999'
+      total_taxes_plus_fees: $747.49
+      total_paid: $747.49
+    - tax_year: '2016'
+      paid_by: Sheila Spruell
+      paid_date: 12/14/2016
+      receipt_number: '5233478'
+      total_taxes_plus_fees: $747.49
+      total_paid: $747.49
+    - tax_year: '2015'
+      paid_by: THE SPRUELLS
+      paid_date: 12/11/2015
+      receipt_number: '5233150'
+      total_taxes_plus_fees: $742.48
+      total_paid: $742.48
+    - tax_year: '2014'
+      paid_by: ''
+      paid_date: 11/21/2014
+      receipt_number: '5232765'
+      total_taxes_plus_fees: $668.30
+      total_paid: $668.30
+    - tax_year: '2013'
+      paid_by: Sheila Spruell
+      paid_date: 12/31/2013
+      receipt_number: '5232604'
+      total_taxes_plus_fees: $747.46
+      total_paid: $747.46
+    - tax_year: '2012'
+      paid_by: Sheila Spruell
+      paid_date: 12/31/2012
+      receipt_number: '5232221'
+      total_taxes_plus_fees: $747.46
+      total_paid: $747.46
+    - tax_year: '2011'
+      paid_by: ''
+      paid_date: 12/31/2011
+      receipt_number: '277314'
+      total_taxes_plus_fees: $757.48
+      total_paid: $757.48
+    - tax_year: '2010'
+      paid_by: INTERNET
+      paid_date: 12/29/2010
+      receipt_number: '276631'
+      total_taxes_plus_fees: $714.40
+      total_paid: $714.40
+    - tax_year: '2009'
+      paid_by: ''
+      paid_date: 12/31/2009
+      receipt_number: '276403'
+      total_taxes_plus_fees: $714.40
+      total_paid: $714.40
+    - tax_year: '2008'
+      paid_by: INTERNET
+      paid_date: 12/29/2008
+      receipt_number: '273251'
+      total_taxes_plus_fees: $728.42
+      total_paid: $728.42
+    - tax_year: '2007'
+      paid_by: ''
+      paid_date: 11/07/2007
+      receipt_number: '268949'
+      total_taxes_plus_fees: $634.24
+      total_paid: $634.24
+    - tax_year: '2006'
+      paid_by: INTERNET
+      paid_date: 02/15/2007
+      receipt_number: '265895'
+      total_taxes_plus_fees: $629.62
+      total_paid: $629.62
+    - tax_year: '2005'
+      paid_by: ''
+      paid_date: 12/31/2005
+      receipt_number: '262648'
+      total_taxes_plus_fees: $608.18
+      total_paid: $608.18
+    - tax_year: '2004'
+      paid_by: ''
+      paid_date: 10/25/2004
+      receipt_number: '259925'
+      total_taxes_plus_fees: $575.12
+      total_paid: $575.12
+    - tax_year: '2003'
+      paid_by: ''
+      paid_date: 02/20/2004
+      receipt_number: '329048'
+      total_taxes_plus_fees: $561.73
+      total_paid: $561.73
+    - tax_year: '2002'
+      paid_by: ''
+      paid_date: 01/31/2003
+      receipt_number: '255537'
+      total_taxes_plus_fees: $522.94
+      total_paid: $522.94
+    - tax_year: '2001'
+      paid_by: ''
+      paid_date: 12/21/2001
+      receipt_number: '254061'
+      total_taxes_plus_fees: $512.99
+      total_paid: $512.99
+    - tax_year: '2000'
+      paid_by: ''
+      paid_date: 12/11/2000
+      receipt_number: '252531'
+      total_taxes_plus_fees: $512.99
+      total_paid: $512.99
+    - tax_year: '1999'
+      paid_by: ''
+      paid_date: 12/02/1999
+      receipt_number: '282367'
+      total_taxes_plus_fees: $512.99
+      total_paid: $512.99
+    - tax_year: '1998'
+      paid_by: ''
+      paid_date: 12/11/1998
+      receipt_number: '248498'
+      total_taxes_plus_fees: $456.28
+      total_paid: $456.28
+    - tax_year: '1997'
+      paid_by: ''
+      paid_date: 11/04/1997
+      receipt_number: '247809'
+      total_taxes_plus_fees: $456.28
+      total_paid: $456.28
+    - tax_year: '1996'
+      paid_by: ''
+      paid_date: ''
+      receipt_number: '244949'
+      total_taxes_plus_fees: $441.28
+      total_paid: $441.28
+  land_information:
+  - appraisal_type: '1'
+    property_class: '2'
+    land_use: 111 - HOUSEHOLD UNITS
+    acreage: '0'
+    square_foot: '0'
+    lot_size: 100S X 326S IRR
+    market_value: $26,800.00
+    current_use_value: $0.00
+  buildings:
+  - general_info:
+      building: '001'
+      building_type: 111 - SINGLE FAMILY
+      effective_building_type: 111 - SINGLE FAMILY
+      year_built: '1965'
+      effective_year_built: '1965'
+      assessment_class: '2'
+      building_class: D0
+      number_of_stories: '1'
+      number_of_rooms: '6'
+      heated_cooled_sq_ft: '1000'
+      base_area: '1000'
+      construction_units: '97'
+      total_adjusted_area: '1219'
+    building_value:
+      base_rate: $60.32
+      adjusted_rate: $58.51
+      subtotal: $71,324.00
+      extra_features: $3,400.00
+      base_cost: $74,724.00
+      cost_index: '1.51'
+      replacement_cost: $112,833.00
+      condition: '70'
+      value: $78,983.00
+      market_adjustment: 0%
+      final_value: $95,600.00
+      miscellaneous_improvement_value: $0.00
+      total_improvement_value: $95,600.00
+    appendages:
+    - appendage: CP 0.6
+      factor: '0.6'
+      area: '264'
+      adjusted_area: '158'
+    - appendage: CP 0.6
+      factor: '0.6'
+      area: '70'
+      adjusted_area: '42'
+    - appendage: U 0.4
+      factor: '0.4'
+      area: '48'
+      adjusted_area: '19'
+    construction_units:
+    - category: FOUNDATION
+      subcategory: WOOD SUBFLOOR
+    - category: EXTERIOR WALLS
+      subcategory: ALUMINUM SIDING
+    - category: ROOF TYPE
+      subcategory: HIP-GABLE
+    - category: ROOF MATERIAL
+      subcategory: ASPHALT SHINGLES, HEAVY
+    - category: FLOORS
+      subcategory: HARDWOOD
+    - category: FLOORS
+      subcategory: CARPET & UNDERLAY
+    - category: INTERIOR FINISH
+      subcategory: DRYWALL(SHEETROCK)
+    - category: PLUMBING
+      subcategory: AVERAGE
+    extra_features:
+    - category: HEATING & AIR COND.
+      description: HEAT/AC FHA
+  deed_information: []
+  ownership_history:
+  - tax_year: '2027'
+    entity_name: SPRUELL THERON C & SHEILA A
+    mailing_address: 758 HIGHCROFT CIR GARDENDALE AL 35071
+  - tax_year: '2026'
+    entity_name: SPRUELL THERON C & SHEILA A
+    mailing_address: 758 HIGHCROFT CIR GARDENDALE AL 35071
+  - tax_year: '2025'
+    entity_name: SPRUELL THERON C & SHEILA A
+    mailing_address: 758 HIGHCROFT CIR GARDENDALE AL 35071
+  - tax_year: '2024'
+    entity_name: SPRUELL THERON C & SHEILA A
+    mailing_address: 758 HIGHCROFT CIR GARDENDALE AL 35071
+  - tax_year: '2023'
+    entity_name: SPRUELL THERON C & SHEILA A
+    mailing_address: 758 HIGHCROFT CIR GARDENDALE AL 35071
+  - tax_year: '2022'
+    entity_name: SPRUELL THERON C & SHEILA A
+    mailing_address: 756 HIGHCROFT CIR GARDENDALE AL 35071
+  - tax_year: '2021'
+    entity_name: SPRUELL THERON C & SHEILA A
+    mailing_address: 756 HIGHCROFT CIR GARDENDALE AL 35071
+  - tax_year: '2020'
+    entity_name: SPRUELL THERON C & SHEILA A
+    mailing_address: 1756 CHERRY AVE BIRMINGHAM AL 35214-2504
+  - tax_year: '2019'
+    entity_name: SPRUELL THERON C & SHEILA A
+    mailing_address: 1756 CHERRY AVE BIRMINGHAM AL 35214-2504
+  - tax_year: '2018'
+    entity_name: SPRUELL THERON C & SHEILA A
+    mailing_address: 1756 CHERRY AVE BIRMINGHAM AL 35214-2504
+  - tax_year: '2017'
+    entity_name: SPRUELL THERON C & SHEILA A
+    mailing_address: 1756 CHERRY AVE BIRMINGHAM AL 35214-2504
+  - tax_year: '2016'
+    entity_name: SPRUELL THERON C & SHEILA A
+    mailing_address: 1756 CHERRY AVE BIRMINGHAM AL 35214-2504
+  - tax_year: '2015'
+    entity_name: SPRUELL THERON C & SHEILA A
+    mailing_address: 1756 CHERRY AVE BIRMINGHAM AL 35214-2504
+  - tax_year: '2014'
+    entity_name: SPRUELL THERON C & SHEILA A
+    mailing_address: 1756 CHERRY AVE BIRMINGHAM AL 35214-2504
+  - tax_year: '2013'
+    entity_name: SPRUELL THERON C & SHEILA A
+    mailing_address: 1756 CHERRY AVE BIRMINGHAM AL 35214-2504
+  - tax_year: '2012'
+    entity_name: SPRUELL THERON C & SHEILA A
+    mailing_address: 1756 CHERRY AVE BIRMINGHAM AL 35214-2504
+  - tax_year: '2011'
+    entity_name: SPRUELL THERON C & SHEILA A
+    mailing_address: 1756 CHERRY AVE BIRMINGHAM AL 35214-2504
+  - tax_year: '2010'
+    entity_name: SPRUELL THERON C & SHEILA A
+    mailing_address: 1756 CHERRY AVE BIRMINGHAM AL 35214-2504
+  - tax_year: '2009'
+    entity_name: SPRUELL THERON C & SHEILA A
+    mailing_address: 1756 CHERRY AVE BIRMINGHAM AL 35214-2504
+  - tax_year: '2008'
+    entity_name: SPRUELL THERON C & SHEILA A
+    mailing_address: 1756 CHERRY AVE BIRMINGHAM AL 35214-2504
+  - tax_year: '2007'
+    entity_name: SPRUELL THERON C & SHEILA A
+    mailing_address: 1756 CHERRY AVE BIRMINGHAM AL 35214-2504
+  - tax_year: '2006'
+    entity_name: SPRUELL THERON C & SHEILA A
+    mailing_address: 1756 CHERRY AVE BIRMINGHAM AL 35214-2504
+  - tax_year: '2005'
+    entity_name: SPRUELL THERON C & SHEILA A
+    mailing_address: 1756 CHERRY AVE BIRMINGHAM AL 35214-2504
+  - tax_year: '2004'
+    entity_name: SPRUELL THERON C & SHEILA A
+    mailing_address: 1756 CHERRY AVE BIRMINGHAM AL 35214-2504
+  - tax_year: '2003'
+    entity_name: SPRUELL THERON C & SHEILA A
+    mailing_address: 1756 CHERRY AVE BIRMINGHAM AL 35214-2504
+  legal_instruments:
+  - instrument_date: 12/27/1988
+    instrument_number: 3524-287
+phases:
+- name: open_portal
+  status: completed
+  final_result: 'OK: search page open'
+  trace:
+  - step: 1
+    thought: Initial navigation
+    actions:
+    - navigate:
+        url: https://eringcapture.jccal.org/
+        new_tab: false
+    current_url: https://eringcapture.jccal.org/
+  - step: 2
+    thought: The user wants us to navigate to https://eringcapture.jccal.org/, wait
+      for stabilization, dismiss any dialogs/disclaimers, click on 'Real Property
+      Search', confirm the real property search page is showing, and finish. We have
+      already navigated to the page in step 1. Now we need to click on 'Real Property
+      Search' (index 247). We can also wait/pause or check if any disclaimers need
+      dismissing.
+    actions:
+    - click:
+        index: 247
+    current_url: https://eringcapture.jccal.org/
+  - step: 3
+    thought: The user requested to open the property search page by navigating to
+      the URL, pausing for 5 seconds, dismissing dialogs/disclaimers, clicking 'Real
+      Property Search', pausing for 3 seconds, and confirming the presence of a search
+      type dropdown and search input field. In the previous steps, we navigated and
+      clicked the link, and the current URL is now https://eringcapture.jccal.org/propsearch.
+      Let's wait for 3 seconds as requested in step 5, or check the page content/screenshot
+      to confirm the real property search page is showing.
+    actions:
+    - wait:
+        seconds: 3
+    current_url: https://eringcapture.jccal.org/propsearch
+  - step: 4
+    thought: 'The user requested to open the property search page, navigate to the
+      URL, pause, dismiss dialogs, click ''Real Property Search'', pause for 3 seconds,
+      confirm the real property search page is showing (with a search type dropdown
+      and a search input field), and finish and report ''OK: search page open'' if
+      confirmed. All steps have been successfully completed, and the browser state
+      clearly shows the dropdown and search input field on the property search page.'
+    actions:
+    - done:
+        text: 'OK: search page open'
+        success: true
+    current_url: https://eringcapture.jccal.org/propsearch
+- name: set_dropdowns
+  status: completed
+  final_result: 'OK: dropdowns set'
+  trace:
+  - step: 1
+    thought: 'The user wants me to set two dropdowns on the real property search page:
+      1) the search type dropdown to ''Parcel #'' (currently set to ''Owner''), and
+      2) the year dropdown to ''2025'' (currently set to ''2026''). Element 904 is
+      the search type dropdown and element 911 is the year dropdown. Since they are
+      standard select elements inside shadow DOM with select_dropdown capability or
+      click followed by selection, let''s use select_dropdown on both. Let''s inspect
+      select_dropdown vs click. Element 904 has options Property Address|Mailing Address|Owner|Parcel
+      #. Element 911 has 2026|2025|2024|2023. Let''s select ''Parcel #'' for index
+      904 and ''2025'' for index 911.'
+    actions:
+    - select_dropdown:
+        index: 904
+        text: 'Parcel #'
+    - select_dropdown:
+        index: 911
+        text: '2025'
+    current_url: https://eringcapture.jccal.org/propsearch
+  - step: 2
+    thought: 'The two dropdowns have been successfully set to ''Parcel #'' and ''2025''
+      respectively, as confirmed by the current browser state and screenshot. I will
+      now complete the task by calling done with ''OK: dropdowns set''.'
+    actions:
+    - done:
+        text: 'OK: dropdowns set'
+        success: true
+    current_url: https://eringcapture.jccal.org/propsearch
+- name: enter_parcel
+  status: completed
+  final_result: 'OK: search submitted'
+  trace:
+  - step: 1
+    thought: 'The user wants to enter the parcel number into the search input field,
+      verify its formatting, handle autocomplete suggestions or click the search button,
+      wait for results, and report ''OK: search submitted''. The search type ''Parcel
+      #'' is already selected. Element 916 is the input field. I will type <secret>x_parcel_digits</secret>
+      into index 916.'
+    actions:
+    - input:
+        index: 916
+        text: <secret>x_parcel_digits</secret>
+        clear: true
+    current_url: https://eringcapture.jccal.org/propsearch
+  - step: 2
+    thought: The parcel number has been typed into the search box and the browser
+      state confirms the field currently shows '20 00 01 1 001 003.000'. No autocomplete
+      suggestions are showing yet or needed since the value is fully entered. According
+      to step 3, if no matching suggestion appears, we should press the submit/search
+      button (index 922). Let's click the search button now.
+    actions:
+    - click:
+        index: 922
+    current_url: https://eringcapture.jccal.org/propsearch
+  - step: 3
+    thought: 'The user request asks to enter the parcel number, run the search, wait
+      up to 5 seconds, and report ''OK: search submitted'' once search results are
+      visible. Looking at the browser state and screenshot, the search has been successfully
+      executed, and results are visible on the page (Displaying records 1 - 1 of 1,
+      Parcel No: 20 00 01 1 001 003.000, Owner: SPRUELL THERON C & SHEILA A). Therefore,
+      the task is fully completed, and I should call the done action.'
+    actions:
+    - done:
+        text: 'OK: search submitted'
+        success: true
+    current_url: https://eringcapture.jccal.org/propsearch
+- name: open_detail
+  status: completed
+  final_result: 'OK: detail page open'
+  trace:
+  - step: 1
+    thought: 'We are currently on the search results page. The user wants us to find
+      the parcel whose Parcel # matches exactly ''20 00 01 1 001 003.000''. Looking
+      at the browser state, there is exactly one record displayed with Parcel No:
+      20 00 01 1 001 003.000. This is an exact match. The ''View Details'' link has
+      index [1420]. We need to click this link to open the detail page and confirm
+      it shows the heading ''Detail for Parcel: 20 00 01 1 001 003.000''.'
+    actions:
+    - click:
+        index: 1420
+    current_url: https://eringcapture.jccal.org/propsearch
+  - step: 2
+    thought: 'The user wants to open the exact matching parcel ''20 00 01 1 001 003.000''
+      and confirm the detail page loaded with the heading ''Detail for Parcel: 20
+      00 01 1 001 003.000''. In the previous step, I clicked the View Details link
+      and now the URL is `https://eringcapture.jccal.org/parceldetail/20%2000%2001%201%20001%20003.000/2025/propsearch`.
+      Let''s check the text on the page to confirm the heading is present.'
+    actions:
+    - done:
+        text: 'OK: detail page open'
+        success: true
+    current_url: https://eringcapture.jccal.org/parceldetail/20%2000%2001%201%20001%20003.000/2025/propsearch
+- name: verify_and_expand
+  status: completed
+  final_result: 'OK: verified and expanded'
+  trace:
+  - step: 1
+    thought: 'The user wants me to verify that I am on the correct parcel detail page
+      (checking the heading ''Detail for Parcel: 20 00 01 1 001 003.000'', owner label,
+      Valuation Summary, and URL containing parceldetail). All checks passed successfully.
+      Now I need to scroll down, find ''View Historical Tax Payments'' and click it
+      if present (and not already expanded as ''Hide Historical Tax Payments''). Then
+      find ''View Instruments'' and click it if present (and not already expanded
+      as ''Hide Instruments''). Finally confirm the labels read ''Hide Historical
+      Tax Payments'' and ''Hide Instruments''. Let''s first scroll down to see those
+      buttons.'
+    actions:
+    - scroll:
+        down: true
+        pages: 2.0
+    current_url: https://eringcapture.jccal.org/parceldetail/20%2000%2001%201%20001%20003.000/2025/propsearch
+  - step: 2
+    thought: We have successfully scrolled down and located the 'View Historical Tax
+      Payments' button (index 2251). According to step 1 of the request, we need to
+      click it to expand the historical payments table. After that, we need to scroll
+      further down to locate and click 'View Instruments'. Let's click index 2251
+      first.
+    actions:
+    - click:
+        index: 2251
+    current_url: https://eringcapture.jccal.org/parceldetail/20%2000%2001%201%20001%20003.000/2025/propsearch
+  - step: 3
+    thought: We have successfully verified the parcel detail page and expanded 'Historical
+      Tax Payments' (which now correctly reads 'Hide Historical Tax Payments'). Next,
+      we need to scroll down further to find and expand 'View Instruments'. Let's
+      scroll down.
+    actions:
+    - scroll:
+        down: true
+        pages: 2.0
+    current_url: https://eringcapture.jccal.org/parceldetail/20%2000%2001%201%20001%20003.000/2025/propsearch
+  - step: 4
+    thought: We need to scroll down further to locate 'View Instruments' since it
+      is below the Building information section.
+    actions:
+    - scroll:
+        down: true
+        pages: 2.0
+    current_url: https://eringcapture.jccal.org/parceldetail/20%2000%2001%201%20001%20003.000/2025/propsearch
+  - step: 5
+    thought: We have verified the page details, expanded 'View Historical Tax Payments',
+      and now we need to click 'View Instruments' (index 2311). Looking at the browser
+      state, element [2311] is the button with text 'View Instruments'. Let's click
+      it to expand the Legal Instruments table.
+    actions:
+    - click:
+        index: 2311
+    current_url: https://eringcapture.jccal.org/parceldetail/20%2000%2001%201%20001%20003.000/2025/propsearch
+  - step: 6
+    thought: We have successfully verified the parcel detail page, scrolled down,
+      expanded 'Historical Tax Payments' (which now reads 'Hide Historical Tax Payments'),
+      and expanded 'Legal Instruments' (which now reads 'Hide Instruments' as confirmed
+      in browser state and vision). All requirements of the user request are fully
+      completed. I will now call done with success=true.
+    actions:
+    - done:
+        text: 'OK: verified and expanded'
+        success: true
+    current_url: https://eringcapture.jccal.org/parceldetail/20%2000%2001%201%20001%20003.000/2025/propsearch
+- name: extract
+  status: completed
+  final_result: '{"identity": {"parcel_number": "20 00 01 1 001 003.000", "tax_year":
+    "2025", "owner": "SPRUELL THERON C & SHEILA A", "property_address": {"street":
+    "2984 SARTAIN DR", "city_state_zip": "ADAMSVILLE AL 35005"}, "mailing_address":
+    {"street": "758 HIGHCROFT CIR", "city_state_zip": "GARDENDALE AL 35071"}, "neighborhood":
+    "03-010.0", "subdivision": "BAILEY & PARRISH 20-1-1", "book": "53", "page": "21",
+    "lot": "4", "acreage": "0.000", "section": "01", "township": "17S", "range": "05W"},
+    "assessment": {"appraised_value": "$122,400", "tax_year": "2025", "property_class":
+    "2", "exempt_code": "", "municipality": "02 - COUNTY-02", "school_district": "",
+    "disability_code": "", "over_65_code": "", "total_hc_area": "1000 Sqft", "metes_and_bounds":
+    "LOT 4 BAILEY & PARRISH SUB", "remarks": "100S X 326S IRR"}, "valuation_summary":
+    {"total_improvement_value": "$95,600", "total_land_value": "$26,800", "total_market_value":
+    "$122,400", "total_appraised_value": "$122,400", "assessed_value": "$24,480",
+    "prior_year_total_improvement_value": "$90,800", "prior_year_total_land_value":
+    "$26,800", "prior_year_total_appraised_value": "$117,600", "bill_number": "5238382
+    - REAL PROPERTY"}, "tax_breakdown": {"rows": [{"year": "2025", "millage_type":
+    "STATE", "property_class": "2", "municipality": "02 - COUNTY-02", "assessed_value":
+    "$24,480", "tax": "$159.12", "exemption": "$0.00", "tax_exemption": "$0.00", "total_tax":
+    "$159.12"}, {"year": "2025", "millage_type": "COUNTY", "property_class": "2",
+    "municipality": "02 - COUNTY-02", "assessed_value": "$24,480", "tax": "$330.48",
+    "exemption": "$0.00", "tax_exemption": "$0.00", "total_tax": "$330.48"}, {"year":
+    "2025", "millage_type": "SCHOOL", "property_class": "2", "municipality": "02 -
+    COUNTY-02", "assessed_value": "$24,480", "tax": "$200.74", "exemption": "$0.00",
+    "tax_exemption": "$0.00", "total_tax": "$200.74"}, {"year": "2025", "millage_type":
+    "DIST SCHOOL", "property_class": "2", "municipality": "02 - COUNTY-02", "assessed_value":
+    "$24,480", "tax": "$0.00", "exemption": "$0.00", "tax_exemption": "$0.00", "total_tax":
+    "$0.00"}, {"year": "2025", "millage_type": "FOREST", "property_class": "2", "municipality":
+    "02 - COUNTY-02", "assessed_value": "$0", "tax": "$0.00", "exemption": "$0.00",
+    "tax_exemption": "$0.00", "total_tax": "$0.00"}, {"year": "2025", "millage_type":
+    "SPC SCHOOL1", "property_class": "2", "municipality": "02 - COUNTY-02", "assessed_value":
+    "$24,480", "tax": "$124.85", "exemption": "$0.00", "tax_exemption": "$0.00", "total_tax":
+    "$124.85"}, {"year": "2025", "millage_type": "SPC SCHOOL2", "property_class":
+    "2", "municipality": "02 - COUNTY-02", "assessed_value": "$24,480", "tax": "$411.26",
+    "exemption": "$0.00", "tax_exemption": "$0.00", "total_tax": "$411.26"}], "fees_and_interest":
+    "$0.00", "tax_total": "$1,226.45", "tax_column_total": "$1,226.45", "tax_total_exemption":
+    "$0.00"}, "tax_payments": {"current": [{"tax_year": "2025", "paid_by": "THERON
+    C SPRUELL SHEILA H SPRUELL", "paid_date": "12/22/2025", "receipt_number": "5238382",
+    "total_taxes_plus_fees": "$1,226.45", "total_paid": "$1,226.45"}], "historical":
+    [{"tax_year": "2024", "paid_by": "THERON C SPRUELL SHEILA H SPRUELL", "paid_date":
+    "12/27/2024", "receipt_number": "5237671", "total_taxes_plus_fees": "$1,178.35",
+    "total_paid": "$1,178.35"}, {"tax_year": "2023", "paid_by": "SPRUELL THERON C
+    & SHEILA A", "paid_date": "12/29/2023", "receipt_number": "5236794", "total_taxes_plus_fees":
+    "$1,060.12", "total_paid": "$1,060.12"}, {"tax_year": "2022", "paid_by": "SPRUELL
+    THERON C & SHEILA A", "paid_date": "12/05/2022", "receipt_number": "5236209",
+    "total_taxes_plus_fees": "$1,081.16", "total_paid": "$1,081.16"}, {"tax_year":
+    "2021", "paid_by": "SHEILA LYNSEE SPRUELL", "paid_date": "12/29/2021", "receipt_number":
+    "5235829", "total_taxes_plus_fees": "$790.58", "total_paid": "$790.58"}, {"tax_year":
+    "2020", "paid_by": "SPRUELL THERON C & SHELIA ANN", "paid_date": "12/18/2020",
+    "receipt_number": "5235502", "total_taxes_plus_fees": "$818.63", "total_paid":
+    "$818.63"}, {"tax_year": "2019", "paid_by": "Sheila Spruell", "paid_date": "11/20/2019",
+    "receipt_number": "5234996", "total_taxes_plus_fees": "$778.55", "total_paid":
+    "$778.55"}, {"tax_year": "2018", "paid_by": "SPRUELL", "paid_date": "10/31/2018",
+    "receipt_number": "5234642", "total_taxes_plus_fees": "$747.49", "total_paid":
+    "$747.49"}, {"tax_year": "2017", "paid_by": "Sheila Spruell", "paid_date": "12/12/2017",
+    "receipt_number": "5233999", "total_taxes_plus_fees": "$747.49", "total_paid":
+    "$747.49"}, {"tax_year": "2016", "paid_by": "Sheila Spruell", "paid_date": "12/14/2016",
+    "receipt_number": "5233478", "total_taxes_plus_fees": "$747.49", "total_paid":
+    "$747.49"}, {"tax_year": "2015", "paid_by": "THE SPRUELLS", "paid_date": "12/11/2015",
+    "receipt_number": "5233150", "total_taxes_plus_fees": "$742.48", "total_paid":
+    "$742.48"}, {"tax_year": "2014", "paid_by": "", "paid_date": "11/21/2014", "receipt_number":
+    "5232765", "total_taxes_plus_fees": "$668.30", "total_paid": "$668.30"}, {"tax_year":
+    "2013", "paid_by": "Sheila Spruell", "paid_date": "12/31/2013", "receipt_number":
+    "5232604", "total_taxes_plus_fees": "$747.46", "total_paid": "$747.46"}, {"tax_year":
+    "2012", "paid_by": "Sheila Spruell", "paid_date": "12/31/2012", "receipt_number":
+    "5232221", "total_taxes_plus_fees": "$747.46", "total_paid": "$747.46"}, {"tax_year":
+    "2011", "paid_by": "", "paid_date": "12/31/2011", "receipt_number": "277314",
+    "total_taxes_plus_fees": "$757.48", "total_paid": "$757.48"}, {"tax_year": "2010",
+    "paid_by": "INTERNET", "paid_date": "12/29/2010", "receipt_number": "276631",
+    "total_taxes_plus_fees": "$714.40", "total_paid": "$714.40"}, {"tax_year": "2009",
+    "paid_by": "", "paid_date": "12/31/2009", "receipt_number": "276403", "total_taxes_plus_fees":
+    "$714.40", "total_paid": "$714.40"}, {"tax_year": "2008", "paid_by": "INTERNET",
+    "paid_date": "12/29/2008", "receipt_number": "273251", "total_taxes_plus_fees":
+    "$728.42", "total_paid": "$728.42"}, {"tax_year": "2007", "paid_by": "", "paid_date":
+    "11/07/2007", "receipt_number": "268949", "total_taxes_plus_fees": "$634.24",
+    "total_paid": "$634.24"}, {"tax_year": "2006", "paid_by": "INTERNET", "paid_date":
+    "02/15/2007", "receipt_number": "265895", "total_taxes_plus_fees": "$629.62",
+    "total_paid": "$629.62"}, {"tax_year": "2005", "paid_by": "", "paid_date": "12/31/2005",
+    "receipt_number": "262648", "total_taxes_plus_fees": "$608.18", "total_paid":
+    "$608.18"}, {"tax_year": "2004", "paid_by": "", "paid_date": "10/25/2004", "receipt_number":
+    "259925", "total_taxes_plus_fees": "$575.12", "total_paid": "$575.12"}, {"tax_year":
+    "2003", "paid_by": "", "paid_date": "02/20/2004", "receipt_number": "329048",
+    "total_taxes_plus_fees": "$561.73", "total_paid": "$561.73"}, {"tax_year": "2002",
+    "paid_by": "", "paid_date": "01/31/2003", "receipt_number": "255537", "total_taxes_plus_fees":
+    "$522.94", "total_paid": "$522.94"}, {"tax_year": "2001", "paid_by": "", "paid_date":
+    "12/21/2001", "receipt_number": "254061", "total_taxes_plus_fees": "$512.99",
+    "total_paid": "$512.99"}, {"tax_year": "2000", "paid_by": "", "paid_date": "12/11/2000",
+    "receipt_number": "252531", "total_taxes_plus_fees": "$512.99", "total_paid":
+    "$512.99"}, {"tax_year": "1999", "paid_by": "", "paid_date": "12/02/1999", "receipt_number":
+    "282367", "total_taxes_plus_fees": "$512.99", "total_paid": "$512.99"}, {"tax_year":
+    "1998", "paid_by": "", "paid_date": "12/11/1998", "receipt_number": "248498",
+    "total_taxes_plus_fees": "$456.28", "total_paid": "$456.28"}, {"tax_year": "1997",
+    "paid_by": "", "paid_date": "11/04/1997", "receipt_number": "247809", "total_taxes_plus_fees":
+    "$456.28", "total_paid": "$456.28"}, {"tax_year": "1996", "paid_by": "", "paid_date":
+    "", "receipt_number": "244949", "total_taxes_plus_fees": "$441.28", "total_paid":
+    "$441.28"}]}, "land_information": [{"appraisal_type": "1", "property_class": "2",
+    "land_use": "111 - HOUSEHOLD UNITS", "acreage": "0", "square_foot": "0", "lot_size":
+    "100S X 326S IRR", "market_value": "$26,800.00", "current_use_value": "$0.00"}],
+    "buildings": [{"general_info": {"building": "001", "building_type": "111 - SINGLE
+    FAMILY", "effective_building_type": "111 - SINGLE FAMILY", "year_built": "1965",
+    "effective_year_built": "1965", "assessment_class": "2", "building_class": "D0",
+    "number_of_stories": "1", "number_of_rooms": "6", "heated_cooled_sq_ft": "1000",
+    "base_area": "1000", "construction_units": "97", "total_adjusted_area": "1219"},
+    "building_value": {"base_rate": "$60.32", "adjusted_rate": "$58.51", "subtotal":
+    "$71,324.00", "extra_features": "$3,400.00", "base_cost": "$74,724.00", "cost_index":
+    "1.51", "replacement_cost": "$112,833.00", "condition": "70", "value": "$78,983.00",
+    "market_adjustment": "0%", "final_value": "$95,600.00", "miscellaneous_improvement_value":
+    "$0.00", "total_improvement_value": "$95,600.00"}, "appendages": [{"appendage":
+    "CP 0.6", "factor": "0.6", "area": "264", "adjusted_area": "158"}, {"appendage":
+    "CP 0.6", "factor": "0.6", "area": "70", "adjusted_area": "42"}, {"appendage":
+    "U 0.4", "factor": "0.4", "area": "48", "adjusted_area": "19"}], "construction_units":
+    [{"category": "FOUNDATION", "subcategory": "WOOD SUBFLOOR"}, {"category": "EXTERIOR
+    WALLS", "subcategory": "ALUMINUM SIDING"}, {"category": "ROOF TYPE", "subcategory":
+    "HIP-GABLE"}, {"category": "ROOF MATERIAL", "subcategory": "ASPHALT SHINGLES,
+    HEAVY"}, {"category": "FLOORS", "subcategory": "HARDWOOD"}, {"category": "FLOORS",
+    "subcategory": "CARPET & UNDERLAY"}, {"category": "INTERIOR FINISH", "subcategory":
+    "DRYWALL(SHEETROCK)"}, {"category": "PLUMBING", "subcategory": "AVERAGE"}], "extra_features":
+    [{"category": "HEATING & AIR COND.", "description": "HEAT/AC FHA"}]}], "deed_information":
+    [], "ownership_history": [{"tax_year": "2027", "entity_name": "SPRUELL THERON
+    C & SHEILA A", "mailing_address": "758 HIGHCROFT CIR GARDENDALE AL 35071"}, {"tax_year":
+    "2026", "entity_name": "SPRUELL THERON C & SHEILA A", "mailing_address": "758
+    HIGHCROFT CIR GARDENDALE AL 35071"}, {"tax_year": "2025", "entity_name": "SPRUELL
+    THERON C & SHEILA A", "mailing_address": "758 HIGHCROFT CIR GARDENDALE AL 35071"},
+    {"tax_year": "2024", "entity_name": "SPRUELL THERON C & SHEILA A", "mailing_address":
+    "758 HIGHCROFT CIR GARDENDALE AL 35071"}, {"tax_year": "2023", "entity_name":
+    "SPRUELL THERON C & SHEILA A", "mailing_address": "758 HIGHCROFT CIR GARDENDALE
+    AL 35071"}, {"tax_year": "2022", "entity_name": "SPRUELL THERON C & SHEILA A",
+    "mailing_address": "756 HIGHCROFT CIR GARDENDALE AL 35071"}, {"tax_year": "2021",
+    "entity_name": "SPRUELL THERON C & SHEILA A", "mailing_address": "756 HIGHCROFT
+    CIR GARDENDALE AL 35071"}, {"tax_year": "2020", "entity_name": "SPRUELL THERON
+    C & SHEILA A", "mailing_address": "1756 CHERRY AVE BIRMINGHAM AL 35214-2504"},
+    {"tax_year": "2019", "entity_name": "SPRUELL THERON C & SHEILA A", "mailing_address":
+    "1756 CHERRY AVE BIRMINGHAM AL 35214-2504"}, {"tax_year": "2018", "entity_name":
+    "SPRUELL THERON C & SHEILA A", "mailing_address": "1756 CHERRY AVE BIRMINGHAM
+    AL 35214-2504"}, {"tax_year": "2017", "entity_name": "SPRUELL THERON C & SHEILA
+    A", "mailing_address": "1756 CHERRY AVE BIRMINGHAM AL 35214-2504"}, {"tax_year":
+    "2016", "entity_name": "SPRUELL THERON C & SHEILA A", "mailing_address": "1756
+    CHERRY AVE BIRMINGHAM AL 35214-2504"}, {"tax_year": "2015", "entity_name": "SPRUELL
+    THERON C & SHEILA A", "mailing_address": "1756 CHERRY AVE BIRMINGHAM AL 35214-2504"},
+    {"tax_year": "2014", "entity_name": "SPRUELL THERON C & SHEILA A", "mailing_address":
+    "1756 CHERRY AVE BIRMINGHAM AL 35214-2504"}, {"tax_year": "2013", "entity_name":
+    "SPRUELL THERON C & SHEILA A", "mailing_address": "1756 CHERRY AVE BIRMINGHAM
+    AL 35214-2504"}, {"tax_year": "2012", "entity_name": "SPRUELL THERON C & SHEILA
+    A", "mailing_address": "1756 CHERRY AVE BIRMINGHAM AL 35214-2504"}, {"tax_year":
+    "2011", "entity_name": "SPRUELL THERON C & SHEILA A", "mailing_address": "1756
+    CHERRY AVE BIRMINGHAM AL 35214-2504"}, {"tax_year": "2010", "entity_name": "SPRUELL
+    THERON C & SHEILA A", "mailing_address": "1756 CHERRY AVE BIRMINGHAM AL 35214-2504"},
+    {"tax_year": "2009", "entity_name": "SPRUELL THERON C & SHEILA A", "mailing_address":
+    "1756 CHERRY AVE BIRMINGHAM AL 35214-2504"}, {"tax_year": "2008", "entity_name":
+    "SPRUELL THERON C & SHEILA A", "mailing_address": "1756 CHERRY AVE BIRMINGHAM
+    AL 35214-2504"}, {"tax_year": "2007", "entity_name": "SPRUELL THERON C & SHEILA
+    A", "mailing_address": "1756 CHERRY AVE BIRMINGHAM AL 35214-2504"}, {"tax_year":
+    "2006", "entity_name": "SPRUELL THERON C & SHEILA A", "mailing_address": "1756
+    CHERRY AVE BIRMINGHAM AL 35214-2504"}, {"tax_year": "2005", "entity_name": "SPRUELL
+    THERON C & SHEILA A", "mailing_address": "1756 CHERRY AVE BIRMINGHAM AL 35214-2504"},
+    {"tax_year": "2004", "entity_name": "SPRUELL THERON C & SHEILA A", "mailing_address":
+    "1756 CHERRY AVE BIRMINGHAM AL 35214-2504"}, {"tax_year": "2003", "entity_name":
+    "SPRUELL THERON C & SHEILA A", "mailing_address": "1756 CHERRY AVE BIRMINGHAM
+    AL 35214-2504"}], "legal_instruments": [{"instrument_date": "12/27/1988", "instrument_number":
+    "3524-287"}]}'
+  trace:
+  - step: 1
+    thought: 'The user wants us to extract the complete structured parcel detail page
+      data for the parcel ''20 00 01 1 001 003.000'' based on the ParcelDetail schema.
+      Since the page is currently loaded and we need to scroll through to gather all
+      information or we can use JavaScript/extraction to pull everything, let''s examine
+      the page content. Wait, let''s look at the page stats: currently we are at the
+      bottom of the page. Let''s scroll up to the top or extract the whole page content
+      to make sure we have all data captured accurately.'
+    actions:
+    - evaluate:
+        code: "(function() {\n  try {\n    return document.body.innerText;\n  } catch\
+          \ (e) {\n    return 'Error: ' + e.message;\n  }\n})()"
+    current_url: https://eringcapture.jccal.org/parceldetail/20%2000%2001%201%20001%20003.000/2025/propsearch
+  - step: 2
+    thought: We have fully inspected the parcel detail page across the text and extracted
+      all necessary information matching the schema precisely. Now we can submit the
+      complete structured JSON response.
+    actions:
+    - done:
+        success: true
+        data:
+          identity:
+            parcel_number: 20 00 01 1 001 003.000
+            tax_year: '2025'
+            owner: SPRUELL THERON C & SHEILA A
+            property_address:
+              street: 2984 SARTAIN DR
+              city_state_zip: ADAMSVILLE AL 35005
+            mailing_address:
+              street: 758 HIGHCROFT CIR
+              city_state_zip: GARDENDALE AL 35071
+            neighborhood: 03-010.0
+            subdivision: BAILEY & PARRISH 20-1-1
+            book: '53'
+            page: '21'
+            lot: '4'
+            acreage: '0.000'
+            section: '01'
+            township: 17S
+            range: 05W
+          assessment:
+            appraised_value: $122,400
+            tax_year: '2025'
+            property_class: '2'
+            exempt_code: ''
+            municipality: 02 - COUNTY-02
+            school_district: ''
+            disability_code: ''
+            over_65_code: ''
+            total_hc_area: 1000 Sqft
+            metes_and_bounds: LOT 4 BAILEY & PARRISH SUB
+            remarks: 100S X 326S IRR
+          valuation_summary:
+            total_improvement_value: $95,600
+            total_land_value: $26,800
+            total_market_value: $122,400
+            total_appraised_value: $122,400
+            assessed_value: $24,480
+            prior_year_total_improvement_value: $90,800
+            prior_year_total_land_value: $26,800
+            prior_year_total_appraised_value: $117,600
+            bill_number: 5238382 - REAL PROPERTY
+          tax_breakdown:
+            rows:
+            - year: '2025'
+              millage_type: STATE
+              property_class: '2'
+              municipality: 02 - COUNTY-02
+              assessed_value: $24,480
+              tax: $159.12
+              exemption: $0.00
+              tax_exemption: $0.00
+              total_tax: $159.12
+            - year: '2025'
+              millage_type: COUNTY
+              property_class: '2'
+              municipality: 02 - COUNTY-02
+              assessed_value: $24,480
+              tax: $330.48
+              exemption: $0.00
+              tax_exemption: $0.00
+              total_tax: $330.48
+            - year: '2025'
+              millage_type: SCHOOL
+              property_class: '2'
+              municipality: 02 - COUNTY-02
+              assessed_value: $24,480
+              tax: $200.74
+              exemption: $0.00
+              tax_exemption: $0.00
+              total_tax: $200.74
+            - year: '2025'
+              millage_type: DIST SCHOOL
+              property_class: '2'
+              municipality: 02 - COUNTY-02
+              assessed_value: $24,480
+              tax: $0.00
+              exemption: $0.00
+              tax_exemption: $0.00
+              total_tax: $0.00
+            - year: '2025'
+              millage_type: FOREST
+              property_class: '2'
+              municipality: 02 - COUNTY-02
+              assessed_value: $0
+              tax: $0.00
+              exemption: $0.00
+              tax_exemption: $0.00
+              total_tax: $0.00
+            - year: '2025'
+              millage_type: SPC SCHOOL1
+              property_class: '2'
+              municipality: 02 - COUNTY-02
+              assessed_value: $24,480
+              tax: $124.85
+              exemption: $0.00
+              tax_exemption: $0.00
+              total_tax: $124.85
+            - year: '2025'
+              millage_type: SPC SCHOOL2
+              property_class: '2'
+              municipality: 02 - COUNTY-02
+              assessed_value: $24,480
+              tax: $411.26
+              exemption: $0.00
+              tax_exemption: $0.00
+              total_tax: $411.26
+            fees_and_interest: $0.00
+            tax_total: $1,226.45
+            tax_column_total: $1,226.45
+            tax_total_exemption: $0.00
+          tax_payments:
+            current:
+            - tax_year: '2025'
+              paid_by: THERON C SPRUELL SHEILA H SPRUELL
+              paid_date: 12/22/2025
+              receipt_number: '5238382'
+              total_taxes_plus_fees: $1,226.45
+              total_paid: $1,226.45
+            historical:
+            - tax_year: '2024'
+              paid_by: THERON C SPRUELL SHEILA H SPRUELL
+              paid_date: 12/27/2024
+              receipt_number: '5237671'
+              total_taxes_plus_fees: $1,178.35
+              total_paid: $1,178.35
+            - tax_year: '2023'
+              paid_by: SPRUELL THERON C & SHEILA A
+              paid_date: 12/29/2023
+              receipt_number: '5236794'
+              total_taxes_plus_fees: $1,060.12
+              total_paid: $1,060.12
+            - tax_year: '2022'
+              paid_by: SPRUELL THERON C & SHEILA A
+              paid_date: 12/05/2022
+              receipt_number: '5236209'
+              total_taxes_plus_fees: $1,081.16
+              total_paid: $1,081.16
+            - tax_year: '2021'
+              paid_by: SHEILA LYNSEE SPRUELL
+              paid_date: 12/29/2021
+              receipt_number: '5235829'
+              total_taxes_plus_fees: $790.58
+              total_paid: $790.58
+            - tax_year: '2020'
+              paid_by: SPRUELL THERON C & SHELIA ANN
+              paid_date: 12/18/2020
+              receipt_number: '5235502'
+              total_taxes_plus_fees: $818.63
+              total_paid: $818.63
+            - tax_year: '2019'
+              paid_by: Sheila Spruell
+              paid_date: 11/20/2019
+              receipt_number: '5234996'
+              total_taxes_plus_fees: $778.55
+              total_paid: $778.55
+            - tax_year: '2018'
+              paid_by: SPRUELL
+              paid_date: 10/31/2018
+              receipt_number: '5234642'
+              total_taxes_plus_fees: $747.49
+              total_paid: $747.49
+            - tax_year: '2017'
+              paid_by: Sheila Spruell
+              paid_date: 12/12/2017
+              receipt_number: '5233999'
+              total_taxes_plus_fees: $747.49
+              total_paid: $747.49
+            - tax_year: '2016'
+              paid_by: Sheila Spruell
+              paid_date: 12/14/2016
+              receipt_number: '5233478'
+              total_taxes_plus_fees: $747.49
+              total_paid: $747.49
+            - tax_year: '2015'
+              paid_by: THE SPRUELLS
+              paid_date: 12/11/2015
+              receipt_number: '5233150'
+              total_taxes_plus_fees: $742.48
+              total_paid: $742.48
+            - tax_year: '2014'
+              paid_by: ''
+              paid_date: 11/21/2014
+              receipt_number: '5232765'
+              total_taxes_plus_fees: $668.30
+              total_paid: $668.30
+            - tax_year: '2013'
+              paid_by: Sheila Spruell
+              paid_date: 12/31/2013
+              receipt_number: '5232604'
+              total_taxes_plus_fees: $747.46
+              total_paid: $747.46
+            - tax_year: '2012'
+              paid_by: Sheila Spruell
+              paid_date: 12/31/2012
+              receipt_number: '5232221'
+              total_taxes_plus_fees: $747.46
+              total_paid: $747.46
+            - tax_year: '2011'
+              paid_by: ''
+              paid_date: 12/31/2011
+              receipt_number: '277314'
+              total_taxes_plus_fees: $757.48
+              total_paid: $757.48
+            - tax_year: '2010'
+              paid_by: INTERNET
+              paid_date: 12/29/2010
+              receipt_number: '276631'
+              total_taxes_plus_fees: $714.40
+              total_paid: $714.40
+            - tax_year: '2009'
+              paid_by: ''
+              paid_date: 12/31/2009
+              receipt_number: '276403'
+              total_taxes_plus_fees: $714.40
+              total_paid: $714.40
+            - tax_year: '2008'
+              paid_by: INTERNET
+              paid_date: 12/29/2008
+              receipt_number: '273251'
+              total_taxes_plus_fees: $728.42
+              total_paid: $728.42
+            - tax_year: '2007'
+              paid_by: ''
+              paid_date: 11/07/2007
+              receipt_number: '268949'
+              total_taxes_plus_fees: $634.24
+              total_paid: $634.24
+            - tax_year: '2006'
+              paid_by: INTERNET
+              paid_date: 02/15/2007
+              receipt_number: '265895'
+              total_taxes_plus_fees: $629.62
+              total_paid: $629.62
+            - tax_year: '2005'
+              paid_by: ''
+              paid_date: 12/31/2005
+              receipt_number: '262648'
+              total_taxes_plus_fees: $608.18
+              total_paid: $608.18
+            - tax_year: '2004'
+              paid_by: ''
+              paid_date: 10/25/2004
+              receipt_number: '259925'
+              total_taxes_plus_fees: $575.12
+              total_paid: $575.12
+            - tax_year: '2003'
+              paid_by: ''
+              paid_date: 02/20/2004
+              receipt_number: '329048'
+              total_taxes_plus_fees: $561.73
+              total_paid: $561.73
+            - tax_year: '2002'
+              paid_by: ''
+              paid_date: 01/31/2003
+              receipt_number: '255537'
+              total_taxes_plus_fees: $522.94
+              total_paid: $522.94
+            - tax_year: '2001'
+              paid_by: ''
+              paid_date: 12/21/2001
+              receipt_number: '254061'
+              total_taxes_plus_fees: $512.99
+              total_paid: $512.99
+            - tax_year: '2000'
+              paid_by: ''
+              paid_date: 12/11/2000
+              receipt_number: '252531'
+              total_taxes_plus_fees: $512.99
+              total_paid: $512.99
+            - tax_year: '1999'
+              paid_by: ''
+              paid_date: 12/02/1999
+              receipt_number: '282367'
+              total_taxes_plus_fees: $512.99
+              total_paid: $512.99
+            - tax_year: '1998'
+              paid_by: ''
+              paid_date: 12/11/1998
+              receipt_number: '248498'
+              total_taxes_plus_fees: $456.28
+              total_paid: $456.28
+            - tax_year: '1997'
+              paid_by: ''
+              paid_date: 11/04/1997
+              receipt_number: '247809'
+              total_taxes_plus_fees: $456.28
+              total_paid: $456.28
+            - tax_year: '1996'
+              paid_by: ''
+              paid_date: ''
+              receipt_number: '244949'
+              total_taxes_plus_fees: $441.28
+              total_paid: $441.28
+          land_information:
+          - appraisal_type: '1'
+            property_class: '2'
+            land_use: 111 - HOUSEHOLD UNITS
+            acreage: '0'
+            square_foot: '0'
+            lot_size: 100S X 326S IRR
+            market_value: $26,800.00
+            current_use_value: $0.00
+          buildings:
+          - general_info:
+              building: '001'
+              building_type: 111 - SINGLE FAMILY
+              effective_building_type: 111 - SINGLE FAMILY
+              year_built: '1965'
+              effective_year_built: '1965'
+              assessment_class: '2'
+              building_class: D0
+              number_of_stories: '1'
+              number_of_rooms: '6'
+              heated_cooled_sq_ft: '1000'
+              base_area: '1000'
+              construction_units: '97'
+              total_adjusted_area: '1219'
+            building_value:
+              base_rate: $60.32
+              adjusted_rate: $58.51
+              subtotal: $71,324.00
+              extra_features: $3,400.00
+              base_cost: $74,724.00
+              cost_index: '1.51'
+              replacement_cost: $112,833.00
+              condition: '70'
+              value: $78,983.00
+              market_adjustment: 0%
+              final_value: $95,600.00
+              miscellaneous_improvement_value: $0.00
+              total_improvement_value: $95,600.00
+            appendages:
+            - appendage: CP 0.6
+              factor: '0.6'
+              area: '264'
+              adjusted_area: '158'
+            - appendage: CP 0.6
+              factor: '0.6'
+              area: '70'
+              adjusted_area: '42'
+            - appendage: U 0.4
+              factor: '0.4'
+              area: '48'
+              adjusted_area: '19'
+            construction_units:
+            - category: FOUNDATION
+              subcategory: WOOD SUBFLOOR
+            - category: EXTERIOR WALLS
+              subcategory: ALUMINUM SIDING
+            - category: ROOF TYPE
+              subcategory: HIP-GABLE
+            - category: ROOF MATERIAL
+              subcategory: ASPHALT SHINGLES, HEAVY
+            - category: FLOORS
+              subcategory: HARDWOOD
+            - category: FLOORS
+              subcategory: CARPET & UNDERLAY
+            - category: INTERIOR FINISH
+              subcategory: DRYWALL(SHEETROCK)
+            - category: PLUMBING
+              subcategory: AVERAGE
+            extra_features:
+            - category: HEATING & AIR COND.
+              description: HEAT/AC FHA
+          deed_information: []
+          ownership_history:
+          - tax_year: '2027'
+            entity_name: SPRUELL THERON C & SHEILA A
+            mailing_address: 758 HIGHCROFT CIR GARDENDALE AL 35071
+          - tax_year: '2026'
+            entity_name: SPRUELL THERON C & SHEILA A
+            mailing_address: 758 HIGHCROFT CIR GARDENDALE AL 35071
+          - tax_year: '2025'
+            entity_name: SPRUELL THERON C & SHEILA A
+            mailing_address: 758 HIGHCROFT CIR GARDENDALE AL 35071
+          - tax_year: '2024'
+            entity_name: SPRUELL THERON C & SHEILA A
+            mailing_address: 758 HIGHCROFT CIR GARDENDALE AL 35071
+          - tax_year: '2023'
+            entity_name: SPRUELL THERON C & SHEILA A
+            mailing_address: 758 HIGHCROFT CIR GARDENDALE AL 35071
+          - tax_year: '2022'
+            entity_name: SPRUELL THERON C & SHEILA A
+            mailing_address: 756 HIGHCROFT CIR GARDENDALE AL 35071
+          - tax_year: '2021'
+            entity_name: SPRUELL THERON C & SHEILA A
+            mailing_address: 756 HIGHCROFT CIR GARDENDALE AL 35071
+          - tax_year: '2020'
+            entity_name: SPRUELL THERON C & SHEILA A
+            mailing_address: 1756 CHERRY AVE BIRMINGHAM AL 35214-2504
+          - tax_year: '2019'
+            entity_name: SPRUELL THERON C & SHEILA A
+            mailing_address: 1756 CHERRY AVE BIRMINGHAM AL 35214-2504
+          - tax_year: '2018'
+            entity_name: SPRUELL THERON C & SHEILA A
+            mailing_address: 1756 CHERRY AVE BIRMINGHAM AL 35214-2504
+          - tax_year: '2017'
+            entity_name: SPRUELL THERON C & SHEILA A
+            mailing_address: 1756 CHERRY AVE BIRMINGHAM AL 35214-2504
+          - tax_year: '2016'
+            entity_name: SPRUELL THERON C & SHEILA A
+            mailing_address: 1756 CHERRY AVE BIRMINGHAM AL 35214-2504
+          - tax_year: '2015'
+            entity_name: SPRUELL THERON C & SHEILA A
+            mailing_address: 1756 CHERRY AVE BIRMINGHAM AL 35214-2504
+          - tax_year: '2014'
+            entity_name: SPRUELL THERON C & SHEILA A
+            mailing_address: 1756 CHERRY AVE BIRMINGHAM AL 35214-2504
+          - tax_year: '2013'
+            entity_name: SPRUELL THERON C & SHEILA A
+            mailing_address: 1756 CHERRY AVE BIRMINGHAM AL 35214-2504
+          - tax_year: '2012'
+            entity_name: SPRUELL THERON C & SHEILA A
+            mailing_address: 1756 CHERRY AVE BIRMINGHAM AL 35214-2504
+          - tax_year: '2011'
+            entity_name: SPRUELL THERON C & SHEILA A
+            mailing_address: 1756 CHERRY AVE BIRMINGHAM AL 35214-2504
+          - tax_year: '2010'
+            entity_name: SPRUELL THERON C & SHEILA A
+            mailing_address: 1756 CHERRY AVE BIRMINGHAM AL 35214-2504
+          - tax_year: '2009'
+            entity_name: SPRUELL THERON C & SHEILA A
+            mailing_address: 1756 CHERRY AVE BIRMINGHAM AL 35214-2504
+          - tax_year: '2008'
+            entity_name: SPRUELL THERON C & SHEILA A
+            mailing_address: 1756 CHERRY AVE BIRMINGHAM AL 35214-2504
+          - tax_year: '2007'
+            entity_name: SPRUELL THERON C & SHEILA A
+            mailing_address: 1756 CHERRY AVE BIRMINGHAM AL 35214-2504
+          - tax_year: '2006'
+            entity_name: SPRUELL THERON C & SHEILA A
+            mailing_address: 1756 CHERRY AVE BIRMINGHAM AL 35214-2504
+          - tax_year: '2005'
+            entity_name: SPRUELL THERON C & SHEILA A
+            mailing_address: 1756 CHERRY AVE BIRMINGHAM AL 35214-2504
+          - tax_year: '2004'
+            entity_name: SPRUELL THERON C & SHEILA A
+            mailing_address: 1756 CHERRY AVE BIRMINGHAM AL 35214-2504
+          - tax_year: '2003'
+            entity_name: SPRUELL THERON C & SHEILA A
+            mailing_address: 1756 CHERRY AVE BIRMINGHAM AL 35214-2504
+          legal_instruments:
+          - instrument_date: 12/27/1988
+            instrument_number: 3524-287
+        files_to_display: []
+    current_url: https://eringcapture.jccal.org/parceldetail/20%2000%2001%201%20001%20003.000/2025/propsearch
