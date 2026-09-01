@@ -9,7 +9,7 @@
 #     --metadata-from-file=startup-script=wg-egress/hub/startup.sh
 #
 # Requires: --scopes=cloud-platform, and a Secret Manager secret named
-# gh-token holding a GitHub token with repo + read:packages.
+# gh-deploy-key holding the private half of a read-only deploy key.
 set -euxo pipefail
 export DEBIAN_FRONTEND=noninteractive
 
@@ -38,29 +38,33 @@ apt-get install -y -qq git jq curl ansible
 
 # The Cloud CLI is preinstalled on GCE Debian images and authenticates as the
 # VM's own service account, so no credential file is needed to read the secret.
-# xtrace is on for the rest of this script, but it must not see the token —
+# xtrace is on for the rest of this script, but it must not see the key —
 # startup-script output goes to the serial console and Cloud Logging, both of
 # which are readable by anyone with project viewer.
 set +x
-TOKEN="$(gcloud secrets versions access latest --secret=gh-token)"
-if [ -z "$TOKEN" ]; then
+install -d -m 700 /root/.ssh
+gcloud secrets versions access latest --secret=gh-deploy-key > /root/.ssh/gh_deploy
+chmod 600 /root/.ssh/gh_deploy
+if ! [ -s /root/.ssh/gh_deploy ]; then
   set -x
-  echo "gh-token secret is empty or unreadable" >&2
+  echo "gh-deploy-key secret is empty or unreadable" >&2
   exit 1
 fi
-
-# x-access-token is the required username for GitHub tokens on both git and
-# GHCR; using an account name here fails with a misleading 403.
-git config --system credential.helper store
-umask 077
-printf 'https://x-access-token:%s@github.com\n' "$TOKEN" > /root/.git-credentials
-chmod 600 /root/.git-credentials
-unset TOKEN
 set -x
-echo "github credentials installed"
+
+# Pin GitHub's host keys rather than trusting whatever answers first. The meta
+# API is rate limited, so fall back to ssh-keyscan and refuse to run unpinned.
+curl -s https://api.github.com/meta \
+  | jq -r '.ssh_keys[]? | "github.com " + .' > /root/.ssh/known_hosts || true
+if ! [ -s /root/.ssh/known_hosts ]; then
+  ssh-keyscan -t rsa,ecdsa,ed25519 github.com > /root/.ssh/known_hosts 2>/dev/null || true
+fi
+[ -s /root/.ssh/known_hosts ] || { echo "could not obtain github host keys" >&2; exit 1; }
+
+export GIT_SSH_COMMAND="ssh -i /root/.ssh/gh_deploy -o IdentitiesOnly=yes -o UserKnownHostsFile=/root/.ssh/known_hosts"
 
 ansible-pull \
-  --url https://github.com/baseproof/utils.git \
+  --url git@github.com:baseproof/utils.git \
   --directory /opt/utils \
   --inventory localhost, \
   --checkout main \
