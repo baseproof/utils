@@ -50,6 +50,7 @@ client/              everything that runs on a Mac
 infra/               cloud resources, not host configuration
   gcp-hub-setup.sh   IP, firewall, VM, DNS
   gcp-publish-endpoint.sh   re-announce the hub IP from a rebuilt VM
+  gcp-egress-check.sh       why the hub cannot reach the internet
 ```
 
 The Caddyfile, systemd unit and `wg0.conf` are not checked in — the playbook
@@ -65,7 +66,8 @@ Two ways to run it.
 
 **Zero-touch at VM creation.** `hub/startup.sh` is injected as startup
 metadata; it fetches a read-only deploy key from Secret Manager and hands off
-to `ansible-pull`. Twenty lines, none of them configuration.
+to `ansible-pull`. No configuration in it — just an egress preflight, apt with
+retries, and the handoff.
 
 One-time setup:
 
@@ -204,6 +206,68 @@ gcloud dns record-sets update _hub.baseproof.net. --zone=baseproof-net \
 it has not tried; once something has actually handshaken, measured history
 outranks published intent.
 
+## When the hub never comes up
+
+The console shows a clean boot, DNS resolves, the metadata server answers — and
+every package fetch times out:
+
+```
+E: Failed to fetch https://deb.debian.org/... connection timed out
+Script "startup-script" failed with error: exit status 100
+```
+
+That is a VM with no path off the VPC. Nothing downstream ran: no WireGuard, no
+Caddy, no `hubd`. The host is bare Debian that happens to be named `wg-hub`.
+
+```bash
+./infra/gcp-egress-check.sh          # from your Mac
+./infra/gcp-egress-check.sh --probe  # and from inside the guest
+```
+
+It walks the whole path — external IP, Cloud NAT, Private Google Access,
+default route, effective firewall, `canIpForward` — and names what it finds.
+Two causes produce this exact pattern:
+
+**No external IP, and no Cloud NAT.** The metadata server is link-local, so it
+answers whether or not the VM has a way out; everything addressed to a public
+IP is dropped at the VPC edge and the sender just waits. The giveaway is that
+even Google's own APIs time out —
+`dial tcp 172.217.119.4:443: i/o timeout` from the guest agent. The hub needs a
+public address regardless, since peers dial UDP 51820 on it:
+
+```bash
+gcloud compute instances add-access-config wg-hub --zone=us-central1-a \
+  --address=$(gcloud compute addresses describe hub-ip \
+                --region=us-central1 --format='value(address)')
+```
+
+**An egress deny in a firewall policy.** `gcloud compute firewall-rules list`
+will not show it. That command lists VPC firewall rules only: not the implied
+allow-egress rule, and not the hierarchical policies on the org or folder or
+the network policies attached to the VPC. A clean-looking listing is not
+evidence of anything. The command that sees all of them is:
+
+```bash
+gcloud compute instances get-effective-firewalls wg-hub --zone=us-central1-a
+```
+
+Once the network is fixed, re-run provisioning in place — no need to recreate
+the VM:
+
+```bash
+gcloud compute ssh wg-hub --zone=us-central1-a --tunnel-through-iap \
+  --command 'sudo google_metadata_script_runner startup'
+```
+
+The startup script now refuses to continue when it cannot get out, and leaves
+its reason in `/var/log/wg-egress-bootstrap.failed` instead of failing halfway
+through apt. Retries cover a mirror that hiccups during boot; they do not cover
+a VPC with no way out, and they are not meant to.
+
+IPv6 lines like `connect (101: Network is unreachable)` are noise. The VM has a
+link-local IPv6 address and no route off it, which is normal; apt now forces
+IPv4 so those forty seconds of timeouts stop drowning the real error.
+
 ## Things worth knowing
 
 **The enrollment key is a root credential.** One 32-byte key at
@@ -212,6 +276,21 @@ nothing about them is stored. Anyone holding the key can mint a token for any
 node name and class. It belongs only on the hub, mode 0600, backed up
 separately from the database. The cost of statelessness is that individual
 tokens cannot be revoked — only `-rotate`, which voids all of them.
+
+**The serial console is not private.** `startup.sh` runs under `set -x`, and
+until this was fixed the trace echoed the `gh-token` value on the way to
+`/root/.git-credentials` — first as the assignment, then again on every
+expansion. Anyone with `compute.instances.getSerialPortOutput` could read it,
+and Cloud Logging kept it. Tracing is now off before the token exists and back
+on after it is written. **If any hub VM ever got past `apt` on the old script,
+rotate the secret:**
+
+```bash
+gh auth token | tr -d '\n' | gcloud secrets versions add gh-token --data-file=-
+```
+
+Nothing else in the script handles a credential, so nothing else needs the
+treatment — but check the trace before adding something that does.
 
 **DNS is not a trust boundary.** A poisoned TXT record points at an endpoint
 that fails the WireGuard handshake; the agent marks it failed and moves on.
