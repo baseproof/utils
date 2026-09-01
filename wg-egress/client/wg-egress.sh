@@ -25,6 +25,17 @@ SELF="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]
 
 [[ $EUID -eq 0 ]] || { echo "run with sudo" >&2; exit 1; }
 BREW="$(brew --prefix 2>/dev/null || sudo -u "${SUDO_USER:-$USER}" brew --prefix)"
+
+# Homebrew refuses to run as root and will not drop privileges itself, so any
+# brew call has to be handed back to the user who invoked sudo.
+brew_user() {
+  local u="${SUDO_USER:-}"
+  [[ -n "$u" && "$u" != "root" ]] || {
+    echo "run this with sudo from your normal account, not as root" >&2
+    return 1
+  }
+  sudo -u "$u" -H "$BREW/bin/brew" "$@"
+}
 export PATH="$BREW/bin:$BREW/sbin:$PATH"
 mkdir -p "$CONF_DIR" "$LOG_DIR"; chmod 700 "$CONF_DIR"
 
@@ -144,9 +155,17 @@ provision() {
 
 cmd_enroll() {
   local hub_url="${1:?usage: enroll <hub-url> <join-token>}" token="${2:?join token required}"
-  command -v wg >/dev/null || brew install wireguard-tools
-  command -v tinyproxy >/dev/null || brew install tinyproxy
-  command -v jq >/dev/null || brew install jq
+  local missing=()
+  command -v wg        >/dev/null || missing+=(wireguard-tools)
+  command -v tinyproxy >/dev/null || missing+=(tinyproxy)
+  command -v jq        >/dev/null || missing+=(jq)
+  if (( ${#missing[@]} )); then
+    log "installing ${missing[*]} as ${SUDO_USER:-$USER}"
+    brew_user install "${missing[@]}" || {
+      echo "install these yourself, then re-run:  brew install ${missing[*]}" >&2
+      exit 1
+    }
+  fi
   provision "$hub_url" "$token" || exit 1
   install_daemon
 }
@@ -177,12 +196,16 @@ cmd_status() {
   jq -r '{client_id,class,tunnel_ip,server_endpoint}' "$CONF_DIR/identity.json" 2>/dev/null \
     || echo "not enrolled"
   echo "--- wireguard ---"
-  wg show "$(utun)" 2>/dev/null || echo "interface down"
+  if [[ -n "$(utun)" ]] && wg show "$(utun)" 2>/dev/null; then :; else
+    echo "interface down"
+    echo "config: $BREW/etc/wireguard/$IFACE.conf"
+    echo "try:    sudo wg-quick up $IFACE"
+  fi
   echo "--- proxy ---"
   local ip port
   ip="$(jq -r .tunnel_ip "$CONF_DIR/identity.json" 2>/dev/null)"
   port="$(jq -r .proxy_port "$CONF_DIR/identity.json" 2>/dev/null)"
-  nc -z "$ip" "$port" 2>/dev/null && echo "listening on $ip:$port" || echo "proxy down"
+  nc -z -G 3 -w 3 "$ip" "$port" 2>/dev/null && echo "listening on $ip:$port" || echo "proxy down"
   echo "--- log ---"
   tail -n 12 "$LOG_DIR/daemon.log" 2>/dev/null
 }
@@ -236,8 +259,13 @@ cmd_run() {
   # Recreates the UDP socket. Needed because a socket bound before the local
   # address changed keeps sending from a source the router will no longer route.
   rebind() {
-    wg-quick down "$IFACE" 2>/dev/null || true
-    wg-quick up "$IFACE" 2>/dev/null || { log "wg-quick up failed"; return 1; }
+    wg-quick down "$IFACE" >/dev/null 2>&1 || true
+    # Keep wg-quick's stderr — when the interface will not come up this is the
+    # only place the reason is recorded.
+    if ! out="$(wg-quick up "$IFACE" 2>&1)"; then
+      log "wg-quick up failed: $out"
+      return 1
+    fi
     cur_ep=""
   }
 
@@ -323,7 +351,7 @@ cmd_run() {
 
     # tinyproxy binds the tunnel address, not the LAN address, so DHCP churn
     # never touches it — but it does need the interface to exist first.
-    if ! nc -z "$ip" "$port" 2>/dev/null; then
+    if ! nc -z -G 3 -w 3 "$ip" "$port" 2>/dev/null; then
       ifconfig "$(utun)" 2>/dev/null | grep -q "$ip" && {
         log "starting tinyproxy on $ip:$port"
         tinyproxy -c "$BREW/etc/tinyproxy/tinyproxy.conf" 2>/dev/null || true
