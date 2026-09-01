@@ -38,14 +38,26 @@ apt-get install -y -qq git jq curl ansible
 
 # The Cloud CLI is preinstalled on GCE Debian images and authenticates as the
 # VM's own service account, so no credential file is needed to read the secret.
+# xtrace is on for the rest of this script, but it must not see the token —
+# startup-script output goes to the serial console and Cloud Logging, both of
+# which are readable by anyone with project viewer.
+set +x
 TOKEN="$(gcloud secrets versions access latest --secret=gh-token)"
-[ -n "$TOKEN" ] || { echo "gh-token secret is empty or unreadable" >&2; exit 1; }
+if [ -z "$TOKEN" ]; then
+  set -x
+  echo "gh-token secret is empty or unreadable" >&2
+  exit 1
+fi
 
 # x-access-token is the required username for GitHub tokens on both git and
 # GHCR; using an account name here fails with a misleading 403.
 git config --system credential.helper store
 umask 077
 printf 'https://x-access-token:%s@github.com\n' "$TOKEN" > /root/.git-credentials
+chmod 600 /root/.git-credentials
+unset TOKEN
+set -x
+echo "github credentials installed"
 
 ansible-pull \
   --url https://github.com/baseproof/utils.git \
