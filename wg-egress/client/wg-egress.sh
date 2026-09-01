@@ -24,7 +24,21 @@ PLIST="/Library/LaunchDaemons/$LABEL.plist"
 SELF="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
 
 [[ $EUID -eq 0 ]] || { echo "run with sudo" >&2; exit 1; }
-BREW="$(brew --prefix 2>/dev/null || sudo -u "${SUDO_USER:-$USER}" brew --prefix)"
+# Resolve the Homebrew prefix WITHOUT invoking brew. This file also runs under
+# launchd, where SUDO_USER and USER are both unset and `set -u` makes any
+# reference to them fatal — which silently crash-loops the daemon at startup.
+# Homebrew also refuses to run as root, so shelling out to it here is wrong
+# even when it would work.
+if [[ -n "${BREW_PREFIX:-}" ]]; then
+  BREW="$BREW_PREFIX"
+elif [[ -x /opt/homebrew/bin/brew ]]; then
+  BREW=/opt/homebrew
+elif [[ -x /usr/local/bin/brew ]]; then
+  BREW=/usr/local
+else
+  echo "cannot locate homebrew; set BREW_PREFIX=/path/to/prefix" >&2
+  exit 1
+fi
 
 # Homebrew refuses to run as root and will not drop privileges itself, so any
 # brew call has to be handed back to the user who invoked sudo.
@@ -160,7 +174,7 @@ cmd_enroll() {
   command -v tinyproxy >/dev/null || missing+=(tinyproxy)
   command -v jq        >/dev/null || missing+=(jq)
   if (( ${#missing[@]} )); then
-    log "installing ${missing[*]} as ${SUDO_USER:-$USER}"
+    log "installing ${missing[*]} as ${SUDO_USER:-root}"
     brew_user install "${missing[@]}" || {
       echo "install these yourself, then re-run:  brew install ${missing[*]}" >&2
       exit 1
@@ -377,7 +391,10 @@ install_daemon() {
   <key>ProgramArguments</key>
   <array><string>/bin/bash</string><string>$SELF</string><string>run</string></array>
   <key>EnvironmentVariables</key>
-  <dict><key>PATH</key><string>$BREW/bin:$BREW/sbin:/usr/bin:/bin:/usr/sbin:/sbin</string></dict>
+  <dict>
+    <key>PATH</key><string>$BREW/bin:$BREW/sbin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    <key>BREW_PREFIX</key><string>$BREW</string>
+  </dict>
   <key>RunAtLoad</key><true/>
   <key>KeepAlive</key><true/>
   <key>ThrottleInterval</key><integer>30</integer>
