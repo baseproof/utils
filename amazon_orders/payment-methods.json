@@ -1,0 +1,690 @@
+{
+  "orders": {
+    "114-3860093-0471413": {
+      "paymentMethods": [
+        {
+          "name": "American Express® Platinum Reserve Credit Card",
+          "number": "1007",
+          "display": "American Express® Platinum Reserve Credit Card••••1007",
+          "issuerImage": "https://m.media-amazon.com/images/I/91oykSgiykL._SL256_.png"
+        }
+      ],
+      "paymentWidgets": [],
+      "url": "https://www.amazon.com/gp/css/summary/print.html?orderID=114-3860093-0471413",
+      "status": "ok",
+      "orderDate": "2026-09-02",
+      "totalAmount": 34.62,
+      "fetchedAt": "2026-09-22T22:35:41.998429+00:00"
+    },
+    "113-2472664-7468241": {
+      "paymentMethods": [
+        {
+          "name": "Apple Card",
+          "number": "3658",
+          "display": "Apple Card••••3658",
+          "issuerImage": "https://m.media-amazon.com/images/I/91wde6nGUJL._SL256_.png"
+        }
+      ],
+      "paymentWidgets": [],
+      "url": "https://www.amazon.com/gp/css/summary/print.html?orderID=113-2472664-7468241",
+      "status": "ok",
+      "orderDate": "2026-09-03",
+      "totalAmount": 54.36,
+      "fetchedAt": "2026-09-22T22:35:47.404955+00:00"
+    },
+    "113-8287581-8192224": {
+      "paymentMethods": [
+        {
+          "name": "Apple Card",
+          "number": "6689",
+          "display": "Apple Card••••6689",
+          "issuerImage": "https://m.media-amazon.com/images/I/91wde6nGUJL._SL256_.png"
+        }
+      ],
+      "paymentWidgets": [],
+      "url": "https://www.amazon.com/gp/css/summary/print.html?orderID=113-8287581-8192224",
+      "status": "ok",
+      "orderDate": "2026-09-04",
+      "totalAmount": 271.86,
+      "fetchedAt": "2026-09-22T22:35:52.131069+00:00"
+    },
+    "113-8801427-8493012": {
+      "paymentMethods": [
+        {
+          "name": "Apple Card",
+          "number": "6689",
+          "display": "Apple Card••••6689",
+          "issuerImage": "https://m.media-amazon.com/images/I/91wde6nGUJL._SL256_.png"
+        }
+      ],
+      "paymentWidgets": [],
+      "url": "https://www.amazon.com/gp/css/summary/print.html?orderID=113-8801427-8493012",
+      "status": "ok",
+      "orderDate": "2026-09-04",
+      "totalAmount": 199.37,
+      "fetchedAt": "2026-09-22T22:35:57.001292+00:00"
+    },
+    "113-0884681-2891405": {
+      "paymentMethods": [
+        {
+          "name": "Apple Card",
+          "number": "6689",
+          "display": "Apple Card••••6689",
+          "issuerImage": "https://m.media-amazon.com/images/I/91wde6nGUJL._SL256_.png"
+        }
+      ],
+      "paymentWidgets": [],
+      "url": "https://www.amazon.com/gp/css/summary/print.html?orderID=113-0884681-2891405",
+      "status": "ok",
+      "orderDate": "2026-09-04",
+      "totalAmount": 609.69,
+      "fetchedAt": "2026-09-22T22:36:02.225291+00:00"
+    },
+    "111-4442398-7961013": {
+      "paymentMethods": [
+        {
+          "name": "American Express® Platinum Reserve Credit Card",
+          "number": "1007",
+          "display": "American Express® Platinum Reserve Credit Card••••1007",
+          "issuerImage": "https://m.media-amazon.com/images/I/91oykSgiykL._SL256_.png"
+        }
+      ],
+      "paymentWidgets": [],
+      "url": "https://www.amazon.com/gp/css/summary/print.html?orderID=111-4442398-7961013",
+      "status": "ok",
+      "orderDate": "2026-09-04",
+      "totalAmount": 141.35,
+      "fetchedAt": "2026-09-22T22:36:08.199051+00:00"
+    },
+    "111-6297860-3356260": {
+      "paymentMethods": [
+        {
+          "name": "American Express® Platinum Reserve Credit Card",
+          "number": "1007",
+          "display": "American Express® Platinum Reserve Credit Card••••1007",
+          "issuerImage": "https://m.media-amazon.com/images/I/91oykSgiykL._SL256_.png"
+        }
+      ],
+      "paymentWidgets": [],
+      "url": "https://www.amazon.com/gp/css/summary/print.html?orderID=111-6297860-3356260",
+      "status": "ok",
+      "orderDate": "2026-09-05",
+      "totalAmount": 29.54,
+      "fetchedAt": "2026-09-22T22:36:13.117932+00:00"
+    },
+    "111-2142741-3559430": {
+      "paymentMethods": [
+        {
+          "name": "American Express® Platinum Reserve Credit Card",
+          "number": "1007",
+          "display": "American Express® Platinum Reserve Credit Card••••1007",
+          "issuerImage": "https://m.media-amazon.com/images/I/91oykSgiykL._SL256_.png"
+        }
+      ],
+      "paymentWidgets": [],
+      "url": "https://www.amazon.com/gp/css/summary/print.html?orderID=111-2142741-3559430",
+      "status": "ok",
+      "orderDate": "2026-09-05",
+      "totalAmount": 10.86,
+      "fetchedAt": "2026-09-22T22:36:17.539942+00:00"
+    },
+    "111-1253755-7697812": {
+      "paymentMethods": [
+        {
+          "name": "American Express® Platinum Reserve Credit Card",
+          "number": "1007",
+          "display": "American Express® Platinum Reserve Credit Card••••1007",
+          "issuerImage": "https://m.media-amazon.com/images/I/91oykSgiykL._SL256_.png"
+        }
+      ],
+      "paymentWidgets": [],
+      "url": "https://www.amazon.com/gp/css/summary/print.html?orderID=111-1253755-7697812",
+      "status": "ok",
+      "orderDate": "2026-09-05",
+      "totalAmount": 9.73,
+      "fetchedAt": "2026-09-22T22:36:22.907673+00:00"
+    },
+    "111-9630962-8256222": {
+      "paymentMethods": [
+        {
+          "name": "Platinum Card®",
+          "number": "1004",
+          "display": "Platinum Card®••••1004",
+          "issuerImage": "https://m.media-amazon.com/images/I/91z+F2t7P1L._SL256_.png"
+        }
+      ],
+      "paymentWidgets": [],
+      "url": "https://www.amazon.com/gp/css/summary/print.html?orderID=111-9630962-8256222",
+      "status": "ok",
+      "orderDate": "2026-09-06",
+      "totalAmount": 9.7,
+      "fetchedAt": "2026-09-22T22:36:29.094188+00:00"
+    },
+    "111-0848059-6409808": {
+      "paymentMethods": [
+        {
+          "name": "Platinum Card®",
+          "number": "1004",
+          "display": "Platinum Card®••••1004",
+          "issuerImage": "https://m.media-amazon.com/images/I/91z+F2t7P1L._SL256_.png"
+        }
+      ],
+      "paymentWidgets": [],
+      "url": "https://www.amazon.com/gp/css/summary/print.html?orderID=111-0848059-6409808",
+      "status": "ok",
+      "orderDate": "2026-09-06",
+      "totalAmount": 14.13,
+      "fetchedAt": "2026-09-22T22:36:34.554964+00:00"
+    },
+    "111-5879726-2145066": {
+      "paymentMethods": [
+        {
+          "name": "Platinum Card®",
+          "number": "1004",
+          "display": "Platinum Card®••••1004",
+          "issuerImage": "https://m.media-amazon.com/images/I/91z+F2t7P1L._SL256_.png"
+        }
+      ],
+      "paymentWidgets": [],
+      "url": "https://www.amazon.com/gp/css/summary/print.html?orderID=111-5879726-2145066",
+      "status": "ok",
+      "orderDate": "2026-09-06",
+      "totalAmount": 10.86,
+      "fetchedAt": "2026-09-22T22:36:39.814886+00:00"
+    },
+    "111-7290113-5353049": {
+      "paymentMethods": [
+        {
+          "name": "Platinum Card®",
+          "number": "1004",
+          "display": "Platinum Card®••••1004",
+          "issuerImage": "https://m.media-amazon.com/images/I/91z+F2t7P1L._SL256_.png"
+        }
+      ],
+      "paymentWidgets": [],
+      "url": "https://www.amazon.com/gp/css/summary/print.html?orderID=111-7290113-5353049",
+      "status": "ok",
+      "orderDate": "2026-09-06",
+      "totalAmount": 76.11,
+      "fetchedAt": "2026-09-22T22:36:45.877176+00:00"
+    },
+    "111-1299766-4722611": {
+      "paymentMethods": [
+        {
+          "name": "Platinum Card®",
+          "number": "1004",
+          "display": "Platinum Card®••••1004",
+          "issuerImage": "https://m.media-amazon.com/images/I/91z+F2t7P1L._SL256_.png"
+        }
+      ],
+      "paymentWidgets": [],
+      "url": "https://www.amazon.com/gp/css/summary/print.html?orderID=111-1299766-4722611",
+      "status": "ok",
+      "orderDate": "2026-09-06",
+      "totalAmount": 100.03,
+      "fetchedAt": "2026-09-22T22:36:52.070829+00:00"
+    },
+    "113-0430806-3237830": {
+      "paymentMethods": [
+        {
+          "name": "American Express® Platinum Reserve Credit Card",
+          "number": "1007",
+          "display": "American Express® Platinum Reserve Credit Card••••1007",
+          "issuerImage": "https://m.media-amazon.com/images/I/91oykSgiykL._SL256_.png"
+        }
+      ],
+      "paymentWidgets": [],
+      "url": "https://www.amazon.com/gp/css/summary/print.html?orderID=113-0430806-3237830",
+      "status": "ok",
+      "orderDate": "2026-09-06",
+      "totalAmount": 28.26,
+      "fetchedAt": "2026-09-22T22:36:58.162328+00:00"
+    },
+    "113-8798487-0183424": {
+      "paymentMethods": [
+        {
+          "name": "American Express® Platinum Reserve Credit Card",
+          "number": "1007",
+          "display": "American Express® Platinum Reserve Credit Card••••1007",
+          "issuerImage": "https://m.media-amazon.com/images/I/91oykSgiykL._SL256_.png"
+        }
+      ],
+      "paymentWidgets": [],
+      "url": "https://www.amazon.com/gp/css/summary/print.html?orderID=113-8798487-0183424",
+      "status": "ok",
+      "orderDate": "2026-09-06",
+      "totalAmount": 32.3,
+      "fetchedAt": "2026-09-22T22:37:03.554636+00:00"
+    },
+    "113-8106472-2499442": {
+      "paymentMethods": [
+        {
+          "name": "American Express® Platinum Reserve Credit Card",
+          "number": "1007",
+          "display": "American Express® Platinum Reserve Credit Card••••1007",
+          "issuerImage": "https://m.media-amazon.com/images/I/91oykSgiykL._SL256_.png"
+        }
+      ],
+      "paymentWidgets": [],
+      "url": "https://www.amazon.com/gp/css/summary/print.html?orderID=113-8106472-2499442",
+      "status": "ok",
+      "orderDate": "2026-09-06",
+      "totalAmount": 33.83,
+      "fetchedAt": "2026-09-22T22:37:09.565256+00:00"
+    },
+    "111-1859511-5729840": {
+      "paymentMethods": [
+        {
+          "name": "American Express® Platinum Reserve Credit Card",
+          "number": "1007",
+          "display": "American Express® Platinum Reserve Credit Card••••1007",
+          "issuerImage": "https://m.media-amazon.com/images/I/91oykSgiykL._SL256_.png"
+        }
+      ],
+      "paymentWidgets": [],
+      "url": "https://www.amazon.com/gp/css/summary/print.html?orderID=111-1859511-5729840",
+      "status": "ok",
+      "orderDate": "2026-09-07",
+      "totalAmount": 8.55,
+      "fetchedAt": "2026-09-22T22:37:15.495438+00:00"
+    },
+    "111-9533675-9760251": {
+      "paymentMethods": [
+        {
+          "name": "American Express® Platinum Reserve Credit Card",
+          "number": "1007",
+          "display": "American Express® Platinum Reserve Credit Card••••1007",
+          "issuerImage": "https://m.media-amazon.com/images/I/91oykSgiykL._SL256_.png"
+        }
+      ],
+      "paymentWidgets": [],
+      "url": "https://www.amazon.com/gp/css/summary/print.html?orderID=111-9533675-9760251",
+      "status": "ok",
+      "orderDate": "2026-09-08",
+      "totalAmount": 0,
+      "fetchedAt": "2026-09-22T22:37:20.242199+00:00"
+    },
+    "111-8529921-4117849": {
+      "paymentMethods": [
+        {
+          "name": "American Express® Platinum Reserve Credit Card",
+          "number": "1007",
+          "display": "American Express® Platinum Reserve Credit Card••••1007",
+          "issuerImage": "https://m.media-amazon.com/images/I/91oykSgiykL._SL256_.png"
+        }
+      ],
+      "paymentWidgets": [],
+      "url": "https://www.amazon.com/gp/css/summary/print.html?orderID=111-8529921-4117849",
+      "status": "ok",
+      "orderDate": "2026-09-08",
+      "totalAmount": 132,
+      "fetchedAt": "2026-09-22T22:37:25.458569+00:00"
+    },
+    "113-9019156-4393068": {
+      "paymentMethods": [
+        {
+          "name": "Platinum Card®",
+          "number": "1004",
+          "display": "Platinum Card®••••1004",
+          "issuerImage": "https://m.media-amazon.com/images/I/91z+F2t7P1L._SL256_.png"
+        }
+      ],
+      "paymentWidgets": [],
+      "url": "https://www.amazon.com/gp/css/summary/print.html?orderID=113-9019156-4393068",
+      "status": "ok",
+      "orderDate": "2026-09-10",
+      "totalAmount": 128.07,
+      "fetchedAt": "2026-09-22T22:37:31.757020+00:00"
+    },
+    "113-4863117-9776254": {
+      "paymentMethods": [
+        {
+          "name": "Platinum Card®",
+          "number": "1004",
+          "display": "Platinum Card®••••1004",
+          "issuerImage": "https://m.media-amazon.com/images/I/91z+F2t7P1L._SL256_.png"
+        }
+      ],
+      "paymentWidgets": [],
+      "url": "https://www.amazon.com/gp/css/summary/print.html?orderID=113-4863117-9776254",
+      "status": "ok",
+      "orderDate": "2026-09-10",
+      "totalAmount": 6.99,
+      "fetchedAt": "2026-09-22T22:37:36.837805+00:00"
+    },
+    "113-9646736-0575414": {
+      "paymentMethods": [
+        {
+          "name": "Platinum Card®",
+          "number": "1004",
+          "display": "Platinum Card®••••1004",
+          "issuerImage": "https://m.media-amazon.com/images/I/91z+F2t7P1L._SL256_.png"
+        }
+      ],
+      "paymentWidgets": [],
+      "url": "https://www.amazon.com/gp/css/summary/print.html?orderID=113-9646736-0575414",
+      "status": "ok",
+      "orderDate": "2026-09-12",
+      "totalAmount": 46.13,
+      "fetchedAt": "2026-09-22T22:37:41.315532+00:00"
+    },
+    "111-6240385-3434651": {
+      "paymentMethods": [
+        {
+          "name": "American Express® Platinum Reserve Credit Card",
+          "number": "1007",
+          "display": "American Express® Platinum Reserve Credit Card••••1007",
+          "issuerImage": "https://m.media-amazon.com/images/I/91oykSgiykL._SL256_.png"
+        }
+      ],
+      "paymentWidgets": [],
+      "url": "https://www.amazon.com/gp/css/summary/print.html?orderID=111-6240385-3434651",
+      "status": "ok",
+      "orderDate": "2026-09-13",
+      "totalAmount": 72.17,
+      "fetchedAt": "2026-09-22T22:37:46.776175+00:00"
+    },
+    "111-8793034-0885061": {
+      "paymentMethods": [
+        {
+          "name": "Platinum Card®",
+          "number": "1004",
+          "display": "Platinum Card®••••1004",
+          "issuerImage": "https://m.media-amazon.com/images/I/91z+F2t7P1L._SL256_.png"
+        }
+      ],
+      "paymentWidgets": [],
+      "url": "https://www.amazon.com/gp/css/summary/print.html?orderID=111-8793034-0885061",
+      "status": "ok",
+      "orderDate": "2026-09-15",
+      "totalAmount": 5.69,
+      "fetchedAt": "2026-09-22T22:37:52.208457+00:00"
+    },
+    "111-3238974-0257029": {
+      "paymentMethods": [
+        {
+          "name": "Platinum Card®",
+          "number": "1004",
+          "display": "Platinum Card®••••1004",
+          "issuerImage": "https://m.media-amazon.com/images/I/91z+F2t7P1L._SL256_.png"
+        }
+      ],
+      "paymentWidgets": [],
+      "url": "https://www.amazon.com/gp/css/summary/print.html?orderID=111-3238974-0257029",
+      "status": "ok",
+      "orderDate": "2026-09-15",
+      "totalAmount": 10.86,
+      "fetchedAt": "2026-09-22T22:37:56.774915+00:00"
+    },
+    "111-3641666-7829848": {
+      "paymentMethods": [
+        {
+          "name": "Platinum Card®",
+          "number": "1004",
+          "display": "Platinum Card®••••1004",
+          "issuerImage": "https://m.media-amazon.com/images/I/91z+F2t7P1L._SL256_.png"
+        }
+      ],
+      "paymentWidgets": [],
+      "url": "https://www.amazon.com/gp/css/summary/print.html?orderID=111-3641666-7829848",
+      "status": "ok",
+      "orderDate": "2026-09-15",
+      "totalAmount": 181.6,
+      "fetchedAt": "2026-09-22T22:38:01.001193+00:00"
+    },
+    "113-5063746-1035417": {
+      "paymentMethods": [
+        {
+          "name": "American Express® Platinum Reserve Credit Card",
+          "number": "1007",
+          "display": "American Express® Platinum Reserve Credit Card••••1007",
+          "issuerImage": "https://m.media-amazon.com/images/I/91oykSgiykL._SL256_.png"
+        }
+      ],
+      "paymentWidgets": [],
+      "url": "https://www.amazon.com/gp/css/summary/print.html?orderID=113-5063746-1035417",
+      "status": "ok",
+      "orderDate": "2026-09-15",
+      "totalAmount": 14.1,
+      "fetchedAt": "2026-09-22T22:38:05.408877+00:00"
+    },
+    "111-9703313-7407407": {
+      "paymentMethods": [
+        {
+          "name": "American Express® Platinum Reserve Credit Card",
+          "number": "1007",
+          "display": "American Express® Platinum Reserve Credit Card••••1007",
+          "issuerImage": "https://m.media-amazon.com/images/I/91oykSgiykL._SL256_.png"
+        }
+      ],
+      "paymentWidgets": [],
+      "url": "https://www.amazon.com/gp/css/summary/print.html?orderID=111-9703313-7407407",
+      "status": "ok",
+      "orderDate": "2026-09-15",
+      "totalAmount": 117,
+      "fetchedAt": "2026-09-22T22:38:11.524591+00:00"
+    },
+    "111-8505745-8941005": {
+      "paymentMethods": [
+        {
+          "name": "Platinum Card®",
+          "number": "1004",
+          "display": "Platinum Card®••••1004",
+          "issuerImage": "https://m.media-amazon.com/images/I/91z+F2t7P1L._SL256_.png"
+        }
+      ],
+      "paymentWidgets": [],
+      "url": "https://www.amazon.com/gp/css/summary/print.html?orderID=111-8505745-8941005",
+      "status": "ok",
+      "orderDate": "2026-09-16",
+      "totalAmount": 33.5,
+      "fetchedAt": "2026-09-22T22:38:15.854113+00:00"
+    },
+    "111-8732908-3582646": {
+      "paymentMethods": [
+        {
+          "name": "American Express® Platinum Reserve Credit Card",
+          "number": "1007",
+          "display": "American Express® Platinum Reserve Credit Card••••1007",
+          "issuerImage": "https://m.media-amazon.com/images/I/91oykSgiykL._SL256_.png"
+        }
+      ],
+      "paymentWidgets": [],
+      "url": "https://www.amazon.com/gp/css/summary/print.html?orderID=111-8732908-3582646",
+      "status": "ok",
+      "orderDate": "2026-09-17",
+      "totalAmount": 64.98,
+      "fetchedAt": "2026-09-22T22:38:22.005215+00:00"
+    },
+    "111-5401489-3624239": {
+      "paymentMethods": [
+        {
+          "name": "Apple Card",
+          "number": "3658",
+          "display": "Apple Card••••3658",
+          "issuerImage": "https://m.media-amazon.com/images/I/91wde6nGUJL._SL256_.png"
+        }
+      ],
+      "paymentWidgets": [],
+      "url": "https://www.amazon.com/gp/css/summary/print.html?orderID=111-5401489-3624239",
+      "status": "ok",
+      "orderDate": "2026-09-19",
+      "totalAmount": 43.49,
+      "fetchedAt": "2026-09-22T22:38:26.577345+00:00"
+    },
+    "111-6649694-5560208": {
+      "paymentMethods": [
+        {
+          "name": "Apple Card",
+          "number": "3658",
+          "display": "Apple Card••••3658",
+          "issuerImage": "https://m.media-amazon.com/images/I/91wde6nGUJL._SL256_.png"
+        }
+      ],
+      "paymentWidgets": [],
+      "url": "https://www.amazon.com/gp/css/summary/print.html?orderID=111-6649694-5560208",
+      "status": "ok",
+      "orderDate": "2026-09-19",
+      "totalAmount": 8.69,
+      "fetchedAt": "2026-09-22T22:38:31.352198+00:00"
+    },
+    "111-8373665-8837825": {
+      "paymentMethods": [
+        {
+          "name": "Apple Card",
+          "number": "3658",
+          "display": "Apple Card••••3658",
+          "issuerImage": "https://m.media-amazon.com/images/I/91wde6nGUJL._SL256_.png"
+        }
+      ],
+      "paymentWidgets": [],
+      "url": "https://www.amazon.com/gp/css/summary/print.html?orderID=111-8373665-8837825",
+      "status": "ok",
+      "orderDate": "2026-09-19",
+      "totalAmount": 503.62,
+      "fetchedAt": "2026-09-22T22:38:36.565953+00:00"
+    },
+    "111-0020466-6201865": {
+      "paymentMethods": [
+        {
+          "name": "Apple Card",
+          "number": "3658",
+          "display": "Apple Card••••3658",
+          "issuerImage": "https://m.media-amazon.com/images/I/91wde6nGUJL._SL256_.png"
+        }
+      ],
+      "paymentWidgets": [],
+      "url": "https://www.amazon.com/gp/css/summary/print.html?orderID=111-0020466-6201865",
+      "status": "ok",
+      "orderDate": "2026-09-19",
+      "totalAmount": 209,
+      "fetchedAt": "2026-09-22T22:38:41.178961+00:00"
+    },
+    "111-2086575-7364226": {
+      "paymentMethods": [
+        {
+          "name": "Apple Card",
+          "number": "3658",
+          "display": "Apple Card••••3658",
+          "issuerImage": "https://m.media-amazon.com/images/I/91wde6nGUJL._SL256_.png"
+        }
+      ],
+      "paymentWidgets": [],
+      "url": "https://www.amazon.com/gp/css/summary/print.html?orderID=111-2086575-7364226",
+      "status": "ok",
+      "orderDate": "2026-09-19",
+      "totalAmount": 17.55,
+      "fetchedAt": "2026-09-22T22:38:46.564265+00:00"
+    },
+    "111-1659546-1514660": {
+      "paymentMethods": [
+        {
+          "name": "Platinum Card®",
+          "number": "1004",
+          "display": "Platinum Card®••••1004",
+          "issuerImage": "https://m.media-amazon.com/images/I/91z+F2t7P1L._SL256_.png"
+        }
+      ],
+      "paymentWidgets": [],
+      "url": "https://www.amazon.com/gp/css/summary/print.html?orderID=111-1659546-1514660",
+      "status": "ok",
+      "orderDate": "2026-09-20",
+      "totalAmount": 43.49,
+      "fetchedAt": "2026-09-22T22:38:52.197546+00:00"
+    },
+    "111-5865433-1246632": {
+      "paymentMethods": [
+        {
+          "name": "Apple Card",
+          "number": "3658",
+          "display": "Apple Card••••3658",
+          "issuerImage": "https://m.media-amazon.com/images/I/91wde6nGUJL._SL256_.png"
+        }
+      ],
+      "paymentWidgets": [],
+      "url": "https://www.amazon.com/gp/css/summary/print.html?orderID=111-5865433-1246632",
+      "status": "ok",
+      "orderDate": "2026-09-20",
+      "totalAmount": 25,
+      "fetchedAt": "2026-09-22T22:38:56.481184+00:00"
+    }
+  },
+  "source": "/Users/crito/baseproof/utils/amazon_orders/amazon-orders-2026-09-22.json",
+  "range": {
+    "start": "2026-09-01",
+    "end": "2026-09-30"
+  },
+  "uniquePaymentMethods": [
+    {
+      "method": "American Express® Platinum Reserve Credit Card ••••1007",
+      "name": "American Express® Platinum Reserve Credit Card",
+      "number": "1007",
+      "orderCount": 15,
+      "orderIds": [
+        "114-3860093-0471413",
+        "111-4442398-7961013",
+        "111-6297860-3356260",
+        "111-2142741-3559430",
+        "111-1253755-7697812",
+        "113-0430806-3237830",
+        "113-8798487-0183424",
+        "113-8106472-2499442",
+        "111-1859511-5729840",
+        "111-9533675-9760251",
+        "111-8529921-4117849",
+        "111-6240385-3434651",
+        "113-5063746-1035417",
+        "111-9703313-7407407",
+        "111-8732908-3582646"
+      ]
+    },
+    {
+      "method": "Platinum Card® ••••1004",
+      "name": "Platinum Card®",
+      "number": "1004",
+      "orderCount": 13,
+      "orderIds": [
+        "111-9630962-8256222",
+        "111-0848059-6409808",
+        "111-5879726-2145066",
+        "111-7290113-5353049",
+        "111-1299766-4722611",
+        "113-9019156-4393068",
+        "113-4863117-9776254",
+        "113-9646736-0575414",
+        "111-8793034-0885061",
+        "111-3238974-0257029",
+        "111-3641666-7829848",
+        "111-8505745-8941005",
+        "111-1659546-1514660"
+      ]
+    },
+    {
+      "method": "Apple Card ••••3658",
+      "name": "Apple Card",
+      "number": "3658",
+      "orderCount": 7,
+      "orderIds": [
+        "113-2472664-7468241",
+        "111-5401489-3624239",
+        "111-6649694-5560208",
+        "111-8373665-8837825",
+        "111-0020466-6201865",
+        "111-2086575-7364226",
+        "111-5865433-1246632"
+      ]
+    },
+    {
+      "method": "Apple Card ••••6689",
+      "name": "Apple Card",
+      "number": "6689",
+      "orderCount": 3,
+      "orderIds": [
+        "113-8287581-8192224",
+        "113-8801427-8493012",
+        "113-0884681-2891405"
+      ]
+    }
+  ],
+  "updatedAt": "2026-09-22T22:38:56.481251+00:00"
+}

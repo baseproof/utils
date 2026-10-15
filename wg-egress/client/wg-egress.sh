@@ -24,7 +24,32 @@ PLIST="/Library/LaunchDaemons/$LABEL.plist"
 SELF="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
 
 [[ $EUID -eq 0 ]] || { echo "run with sudo" >&2; exit 1; }
-BREW="$(brew --prefix 2>/dev/null || sudo -u "${SUDO_USER:-$USER}" brew --prefix)"
+# Resolve the Homebrew prefix WITHOUT invoking brew. This file also runs under
+# launchd, where SUDO_USER and USER are both unset and `set -u` makes any
+# reference to them fatal — which silently crash-loops the daemon at startup.
+# Homebrew also refuses to run as root, so shelling out to it here is wrong
+# even when it would work.
+if [[ -n "${BREW_PREFIX:-}" ]]; then
+  BREW="$BREW_PREFIX"
+elif [[ -x /opt/homebrew/bin/brew ]]; then
+  BREW=/opt/homebrew
+elif [[ -x /usr/local/bin/brew ]]; then
+  BREW=/usr/local
+else
+  echo "cannot locate homebrew; set BREW_PREFIX=/path/to/prefix" >&2
+  exit 1
+fi
+
+# Homebrew refuses to run as root and will not drop privileges itself, so any
+# brew call has to be handed back to the user who invoked sudo.
+brew_user() {
+  local u="${SUDO_USER:-}"
+  [[ -n "$u" && "$u" != "root" ]] || {
+    echo "run this with sudo from your normal account, not as root" >&2
+    return 1
+  }
+  sudo -u "$u" -H "$BREW/bin/brew" "$@"
+}
 export PATH="$BREW/bin:$BREW/sbin:$PATH"
 mkdir -p "$CONF_DIR" "$LOG_DIR"; chmod 700 "$CONF_DIR"
 
@@ -144,9 +169,17 @@ provision() {
 
 cmd_enroll() {
   local hub_url="${1:?usage: enroll <hub-url> <join-token>}" token="${2:?join token required}"
-  command -v wg >/dev/null || brew install wireguard-tools
-  command -v tinyproxy >/dev/null || brew install tinyproxy
-  command -v jq >/dev/null || brew install jq
+  local missing=()
+  command -v wg        >/dev/null || missing+=(wireguard-tools)
+  command -v tinyproxy >/dev/null || missing+=(tinyproxy)
+  command -v jq        >/dev/null || missing+=(jq)
+  if (( ${#missing[@]} )); then
+    log "installing ${missing[*]} as ${SUDO_USER:-root}"
+    brew_user install "${missing[@]}" || {
+      echo "install these yourself, then re-run:  brew install ${missing[*]}" >&2
+      exit 1
+    }
+  fi
   provision "$hub_url" "$token" || exit 1
   install_daemon
 }
@@ -177,12 +210,16 @@ cmd_status() {
   jq -r '{client_id,class,tunnel_ip,server_endpoint}' "$CONF_DIR/identity.json" 2>/dev/null \
     || echo "not enrolled"
   echo "--- wireguard ---"
-  wg show "$(utun)" 2>/dev/null || echo "interface down"
+  if [[ -n "$(utun)" ]] && wg show "$(utun)" 2>/dev/null; then :; else
+    echo "interface down"
+    echo "config: $BREW/etc/wireguard/$IFACE.conf"
+    echo "try:    sudo wg-quick up $IFACE"
+  fi
   echo "--- proxy ---"
   local ip port
   ip="$(jq -r .tunnel_ip "$CONF_DIR/identity.json" 2>/dev/null)"
   port="$(jq -r .proxy_port "$CONF_DIR/identity.json" 2>/dev/null)"
-  nc -z "$ip" "$port" 2>/dev/null && echo "listening on $ip:$port" || echo "proxy down"
+  nc -z -G 3 -w 3 "$ip" "$port" 2>/dev/null && echo "listening on $ip:$port" || echo "proxy down"
   echo "--- log ---"
   tail -n 12 "$LOG_DIR/daemon.log" 2>/dev/null
 }
@@ -236,8 +273,13 @@ cmd_run() {
   # Recreates the UDP socket. Needed because a socket bound before the local
   # address changed keeps sending from a source the router will no longer route.
   rebind() {
-    wg-quick down "$IFACE" 2>/dev/null || true
-    wg-quick up "$IFACE" 2>/dev/null || { log "wg-quick up failed"; return 1; }
+    wg-quick down "$IFACE" >/dev/null 2>&1 || true
+    # Keep wg-quick's stderr — when the interface will not come up this is the
+    # only place the reason is recorded.
+    if ! out="$(wg-quick up "$IFACE" 2>&1)"; then
+      log "wg-quick up failed: $out"
+      return 1
+    fi
     cur_ep=""
   }
 
@@ -323,9 +365,10 @@ cmd_run() {
 
     # tinyproxy binds the tunnel address, not the LAN address, so DHCP churn
     # never touches it — but it does need the interface to exist first.
-    if ! nc -z "$ip" "$port" 2>/dev/null; then
+    if ! nc -z -G 3 -w 3 "$ip" "$port" 2>/dev/null; then
       ifconfig "$(utun)" 2>/dev/null | grep -q "$ip" && {
-        log "starting tinyproxy on $ip:$port"
+          log "starting tinyproxy on $ip:$port"
+        pkill -f "tinyproxy -c $BREW/etc/tinyproxy" 2>/dev/null || true
         tinyproxy -c "$BREW/etc/tinyproxy/tinyproxy.conf" 2>/dev/null || true
       }
     fi
@@ -349,7 +392,10 @@ install_daemon() {
   <key>ProgramArguments</key>
   <array><string>/bin/bash</string><string>$SELF</string><string>run</string></array>
   <key>EnvironmentVariables</key>
-  <dict><key>PATH</key><string>$BREW/bin:$BREW/sbin:/usr/bin:/bin:/usr/sbin:/sbin</string></dict>
+  <dict>
+    <key>PATH</key><string>$BREW/bin:$BREW/sbin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    <key>BREW_PREFIX</key><string>$BREW</string>
+  </dict>
   <key>RunAtLoad</key><true/>
   <key>KeepAlive</key><true/>
   <key>ThrottleInterval</key><integer>30</integer>
@@ -359,8 +405,31 @@ install_daemon() {
 </plist>
 EOF
   chown root:wheel "$PLIST"; chmod 644 "$PLIST"
+  plutil -lint "$PLIST" >/dev/null || { echo "generated plist is invalid" >&2; return 1; }
+
+  # bootout is asynchronous. Bootstrapping before the old job has finished
+  # unloading returns EIO ("Bootstrap failed: 5"), which leaves nothing
+  # loaded at all — so wait for it to actually disappear.
   launchctl bootout system/"$LABEL" 2>/dev/null || true
-  launchctl bootstrap system "$PLIST"
+  for _ in $(seq 1 30); do
+    launchctl print system/"$LABEL" >/dev/null 2>&1 || break
+    sleep 0.5
+  done
+
+  # Any tinyproxy left from a previous run is bound to an address that may no
+  # longer exist; the supervisor starts its own.
+  pkill -f "tinyproxy -c $BREW/etc/tinyproxy" 2>/dev/null || true
+
+  local rc=1
+  for attempt in 1 2 3; do
+    if launchctl bootstrap system "$PLIST" 2>/dev/null; then rc=0; break; fi
+    log "bootstrap attempt $attempt failed, retrying"
+    sleep 2
+  done
+  if (( rc != 0 )); then
+    echo "could not load $LABEL — try: sudo launchctl bootstrap system $PLIST" >&2
+    return 1
+  fi
   pmset -a sleep 0 disablesleep 1 || true
   log "daemon installed; starts at boot with no login"
 }

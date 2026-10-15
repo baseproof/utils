@@ -1,0 +1,91 @@
+{
+  "113-2125313-6734613": {
+    "manualPaymentMethod": {
+      "name": "Cash",
+      "source": "user recollection, 2026-09-22",
+      "confidence": "unsure"
+    },
+    "acknowledge": [
+      {
+        "code": "uncharged_total",
+        "detail": "page says 'No current charges' but grand total is 66.23"
+      }
+    ],
+    "note": "Whole Foods Oxnard in-store pickup; Amazon shows 'No current charges'. User thinks it was paid in cash at the register. Export-vs-page total gap left open pending the Whole Foods discount question."
+  },
+  "111-6214864-8790601": {
+    "acknowledge": [
+      "underpaid"
+    ],
+    "note": "Visa ****2086 was charged $19.99 (ledger p68#19). The rest was Amazon Store Card Cashback points: $37.10 charged (p69#1) less a $9.11 points refund filed under 106-6108362-0688258 (p69#0) = $27.99, the second item. $19.99 + $27.99 = Grand Total $47.98. The order page lists only the Visa.",
+    "source": "order page pasted by user + ledger, 2026-09-22"
+  },
+  "111-7889186-2595426": {
+    "noCard": "paid entirely with Amazon Store Card Cashback points, $16.11 (ledger p69#2); no card charge in the ledger",
+    "acknowledge": [
+      "no_ledger_charge"
+    ],
+    "note": "Same day and same points pattern as 111-6214864-8790601. The order page names Visa ****2086 (the card on file), but the ledger shows the Visa was never charged.",
+    "source": "ledger, 2026-09-22 (pattern confirmed on 111-6214864-8790601's page)"
+  },
+  "114-2183720-2460251": {
+    "acknowledge": [
+      "no_ledger_charge"
+    ],
+    "note": "Order page banner 'Backup payment method used': Visa ****4686 charged, Grand Total $30.45. No matching row in the ledger.",
+    "source": "order page pasted by user, 2026-09-22"
+  },
+  "114-1881572-4059413": {
+    "acknowledge": [
+      "multi_card"
+    ],
+    "note": "Ledger shows three payments: Apple Card (Mastercard ****6689) $158.07 on Jul 24 (p6#16), Amazon Gift Card $50.00 on Jul 24 (p6#17), Amex Platinum ****1004 $82.00 on Jul 25 (p6#15). $158.07 + $82.00 = Grand Total $240.07. The order page now lists only Platinum Card ****1004 + Amazon Gift Card.",
+    "source": "order page pasted by user + ledger, 2026-09-22"
+  },
+  "112-2543624-6669019": {
+    "acknowledge": [
+      "no_ledger_charge"
+    ],
+    "note": "Order page: AmazonPLCC (Amazon Store Card) ****9611, Grand Total $95.94. No matching row in the ledger.",
+    "source": "order page pasted by user, 2026-09-22"
+  },
+  "112-7372300-4811433": {
+    "acknowledge": [
+      "no_ledger_charge"
+    ],
+    "note": "Order page: AmazonPLCC (Amazon Store Card) ****9611, Grand Total $74.71. No matching row in the ledger. Settled like 112-2543624-6669019: rely on what the page provides.",
+    "source": "fetched order page, 2026-09-22"
+  },
+  "112-8958321-4148237": {
+    "acknowledge": [
+      "no_ledger_charge"
+    ],
+    "note": "Order page: AmazonPLCC (Amazon Store Card) ****9611, Grand Total $15.98. No matching row in the ledger. Settled like 112-2543624-6669019: rely on what the page provides.",
+    "source": "fetched order page, 2026-09-22"
+  },
+  "111-5386452-9908247": {
+    "noCard": "order page: Rewards Points -$17.46, Grand Total $0.00; the export's $350.00 was never charged",
+    "note": "SquareTrade protection plan. Amazon shows how it was paid (points), so it is not an Unknown payment.",
+    "source": "fetched order page, 2026-09-22"
+  },
+  "113-3896753-4929843": {
+    "acknowledge": [
+      "overpaid"
+    ],
+    "cardAmount": 23.23,
+    "note": "Order page: AmazonPLCC (Amazon Store Card) ****9611, Grand Total $23.23, Refund Total $12.56. The refund equals the CeraVe serum ($11.50) with its tax; the $10.67 left is the PanOxyl wash (the page's FSA/HSA-eligible amount). The ledger lists the $23.23 charge twice on Jun 26, 2024 (p40#4, p40#5); the page fits one charge. Not checked against the Store Card statement.",
+    "source": "order page pasted by user, 2026-09-22"
+  },
+  "113-7892851-4138659": {
+    "items": [
+      {
+        "title": "Christmas Tree",
+        "quantity": 1,
+        "unitPrice": 69.99,
+        "lineTotal": 69.99
+      }
+    ],
+    "note": "Whole Foods Market in-store purchase (pickup at 6730 Papermill Dr, Knoxville TN): the export lists no items. The order page reads 'Purchased at Whole Foods Market Christmas Tree $69.99'; its product link is /dp/_ASINLESS_ (no ASIN).",
+    "source": "order page html/113-7892851-4138659.html, and its print view pasted by user (https://www.amazon.com/gp/css/summary/print.html?orderID=113-7892851-4138659), 2026-09-23"
+  }
+}
