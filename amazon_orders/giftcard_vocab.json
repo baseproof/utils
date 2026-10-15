@@ -1,0 +1,9 @@
+[
+  "First reload bonus [credit]",
+  "Gift Card Balance added from Reload [credit, order]",
+  "Gift Card added [credit, detail]",
+  "Gift Card applied to Amazon.com order [debit, order]",
+  "Refund from Amazon.com order [credit, order]",
+  "Refund from Amazon.com order [credit]",
+  "Release of Gift Card Balance hold from Amazon.com order [credit, order]"
+]
