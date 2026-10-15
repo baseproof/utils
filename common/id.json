@@ -1,0 +1,52 @@
+{
+  "jurisdictions": [
+    {
+      "location": {
+        "type": "county",
+        "state": "AL",
+        "name": "Jefferson",
+        "referenceId": 1
+      },
+              "instrument_detail": {
+          "metadata_labels": {
+            "Instrument #": "instrument_no",
+            "Book/Page": "book_page",
+            "Record Date": "record_date",
+            "Book Type": "book_type",
+            "Doc Type": "document_type",
+            "# of Pages": "page_count",
+            "Grantor": "grantors",
+            "Grantee": "grantees",
+            "# of Names": "name_count",
+            "Sale Amount": "sale_amount",
+            "MTG Amount": "mortgage_amount",
+            "Consideration": "consideration_amount",
+            "Mineral Tax": "mineral_tax",
+            "Legal Desc.": "legal_description"
+          }
+        },
+      "propertyIdentifier": {
+        "type": "parcel",
+        "displayNames": [
+          "Parcel #",
+          "Parcel:",
+          "Parcel Number:",
+          "Parcel ID"
+        ],
+        "formatConfig": {
+          "standardFormat": "XX-XX-XX-X-XXX-XXX.XXX",
+          "validationRegex": "^\\d{2}[ \\-\\.]?\\d{2}[ \\-\\.]?\\d{2}[ \\-\\.]?\\d[ \\-\\.]?\\d{3}[ \\-\\.]?\\d{3}\\.\\d{3}$",
+          "replaceRegex": "(\\d{2})[ \\-\\.]?(\\d{2})[ \\-\\.]?(\\d{2})[ \\-\\.]?(\\d)[ \\-\\.]?(\\d{3})[ \\-\\.]?(\\d{3}\\.\\d{3})",
+          "replacePattern": "$1-$2-$3-$4-$5-$6",
+          "acceptableInputExamples": [
+            "30 00 14 3 001 006.000",
+            "30-00-14-3-001-006.000",
+            "3000143001006.000",
+            "22.00.36.1.020.008.308"
+          ]
+        }
+
+      }
+    }
+    ]
+  }

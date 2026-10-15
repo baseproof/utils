@@ -5,8 +5,8 @@ ownership per stage is listed in settings.py.
 """
 import asyncio
 import json
-import random
 import os
+import re
 import sys
 import argparse
 from datetime import datetime, timezone
@@ -16,19 +16,13 @@ from google.cloud import firestore
 
 from scrape_utils import capture_mhtml, log, smooth_scroll, start_browser
 from settings import FIRESTORE_DB, GCP_PROJECT, PROPERTIES, SCRAPE_LOGS
+from tuning import TUNING, wait
 
 # ==========================================
 # 0. TIMING & DELAY CONSTANTS (Configurable)
 # ==========================================
 
-DELAY_PAGE_MIN = 4.0
-DELAY_PAGE_MAX = 7.5
-DELAY_HESITATION_MIN = 1.0
-DELAY_HESITATION_MAX = 2.0
-POLL_INTERVAL = 1.0
-MAX_POLL_RETRIES = 15      
-DELAY_DOM_SETTLE = 1.0     
-PAGE_TIMEOUT = 180.0       # Max seconds allowed per page scrape
+T = TUNING.inventory   # waits live in tuning.toml [inventory]
 
 # ==========================================
 # 1. CONFIGURATION & SETUP
@@ -142,66 +136,34 @@ async def save_mhtml(page, filename="error_page.mhtml"):
         with open(filename.replace(".mhtml", ".html"), "w", encoding="utf-8") as f:
             f.write(html)
 
-async def derive_total_pages(browser, slug, filter_path=""):
-    """Visits base URL to verify results exist and extracts total pages based ONLY on exact matches."""
-    url = search_url(slug, filter_path)
-    log(f"🔍 Checking for results and determining total pages for {slug}...")
-    
-    page = await browser.get(url)
-    
-    page_loaded = False
-    for _ in range(MAX_POLL_RETRIES):
-        if await page.evaluate("!!document.querySelector('#__next') || !!document.querySelector('[data-testid=\"property-card\"]')"):
-            page_loaded = True
-            break
-        await asyncio.sleep(POLL_INTERVAL)
-        
-    if not page_loaded:
-        log("⚠️ Bot protection blocked the initial page load. Defaulting to 1 page.")
-        return 1
-        
-    await asyncio.sleep(DELAY_DOM_SETTLE) 
-    
-    log("Results confirmed! Scrolling to calculate exact match pagination...")
-    await smooth_scroll(page)
-    await asyncio.sleep(1.0)
-    
-    js_pagination = """
-        (() => {
-            const totalEl = document.querySelector('[data-testid="total-results"]');
-            if (totalEl && totalEl.innerText.trim() === '0') {
-                return 0;
-            }
-            
-            const bodyText = document.body.innerText || "";
-            if (bodyText.includes('0 results that match your search')) {
-                return 0;
-            }
-            
-            if (totalEl) {
-                const totalText = totalEl.innerText.replace(/[^0-9]/g, '');
-                const total = parseInt(totalText);
-                if (!isNaN(total) && total > 0) {
-                    return Math.ceil(total / 42);
-                }
-            }
-            
-            const pages = Array.from(document.querySelectorAll('a[aria-label*="page"], a.pagination-item'))
-                .map(el => parseInt(el.innerText))
-                .filter(n => !isNaN(n))
-                .sort((a,b) => b-a);
-            return pages.length > 0 ? pages[0] : 1;
-        })()
-    """
-    
-    max_page = await page.evaluate(js_pagination)
-    
-    if max_page == 0:
-        log(f"⚠️ 0 exact results found for {slug}. Skipping this location.")
-        return 0
-        
-    log(f"✅ Calculated exact max pages: {max_page}")
-    return max_page
+# What a search page says about itself: the "Next ›" link of its pagination and the total
+# realtor.com shows. Pages are walked by following Next; the total is recorded only to compare.
+JS_PAGE_STATE = """
+    (() => {
+        const nav = document.querySelector('nav[data-testid="pagination"]');
+        const next = nav ? Array.from(nav.querySelectorAll('a[href]')).find(a => /^next/i.test((a.innerText || '').trim())) : null;
+        const totalEl = document.querySelector('[data-testid="total-results"]');
+        const shown = totalEl ? parseInt(totalEl.innerText.replace(/[^0-9]/g, ''), 10) : NaN;
+        return JSON.stringify({next_href: next ? next.getAttribute('href') : null, shown: Number.isNaN(shown) ? null : shown});
+    })()
+"""
+
+# Cards are on the page, or the page says it has no results
+JS_RESULTS_READY = """
+    !!document.querySelector('[data-testid="property-card"]')
+    || ((document.querySelector('[data-testid="total-results"]') || {}).innerText || '').trim() === '0'
+    || /(^|\\D)0 results that match your search/.test((document.body && document.body.innerText) || '')
+"""
+
+def next_page_number(next_href, page_num):
+    """The page the Next link leads to: None on the last page. A Next link to anywhere but the
+    following page is markup this code doesn't understand, so it raises."""
+    if not next_href:
+        return None
+    m = re.search(r"/pg-(\d+)", next_href)
+    if not m or int(m.group(1)) != page_num + 1:
+        raise ValueError(f"page {page_num}'s Next link points to {next_href}")
+    return page_num + 1
 
 
 # ==========================================
@@ -338,118 +300,116 @@ async def run_master_scraper(browser, target_slug, pages_str, rerun, collected, 
     """
 
     try:
-        if pages_str:
-            pages_to_scrape = parse_page_ranges(pages_str)
-        else:
-            max_p = await derive_total_pages(browser, slug, filter_path)
-            if max_p == 0:
-                log(f"⏭️ Skipping {slug} due to no exact results.")
-                if log_ref:
-                    await log_ref.set({"status": "completed", "last_completed": firestore.SERVER_TIMESTAMP}, merge=True)
-                return True, browser
-                
-            pages_to_scrape = list(range(1, max_p + 1))
-            
+        explicit_pages = parse_page_ranges(pages_str) if pages_str else None
+
         log(f"\nTargeting Location: {slug}")
         log(f"Filters: {filter_path or 'none'}" + (f" (home type: {home_type})" if home_type else ""))
-        log(f"Target Pages: {pages_to_scrape}")
+        log(f"Target Pages: {explicit_pages if explicit_pages is not None else 'page 1 onward, following each Next link'}")
+
+        # Sub-function to isolate per-page logic for timeout enforcement. Returns what the page
+        # says about itself: the page its Next link leads to (None on the last page), the total
+        # realtor.com shows, and how many properties were kept.
+        async def scrape_single_page(p_num):
+            url = search_url(slug, filter_path, p_num)
+            log(f"\n--- Scraping Page {p_num} | {url} ---")
+            
+            page = await browser.get(url)
+            
+            log("Waiting for page load and bot protection clearance...")
+            page_ready = False
+            for _ in range(T.poll_retries): 
+                if await page.evaluate(JS_RESULTS_READY) is True:
+                    page_ready = True
+                    break
+                await asyncio.sleep(T.poll_interval) 
+            
+            if not page_ready:
+                log(f"Timeout: Could not find property data. Bot protection likely triggered or page is empty.")
+                await save_mhtml(page, f"failed_bot_challenge_{slug}_pg{p_num}.mhtml")
+                # Force a TimeoutError to trigger the browser restart block below
+                raise asyncio.TimeoutError("Bot protection/empty page detected") 
+            
+            if not await page.evaluate("!!document.querySelector('[data-testid=\"property-card\"]')"):
+                log("realtor.com shows 0 results for this search.")
+                return None, 0, 0
+            
+            await asyncio.sleep(wait(T.hesitation)) 
+            
+            log("Scrolling page to trigger lazy loading...")
+            await smooth_scroll(page)
+            
+            log("Extracting payload from DOM...")
+            json_payload = await page.evaluate(js_extract_script)
+            properties_list = json.loads(json_payload) if json_payload else []
+            state = json.loads(await page.evaluate(JS_PAGE_STATE))
+            next_page = next_page_number(state["next_href"], p_num)
+
+            # Cards without a property_id can't be keyed; the limit counts what is kept
+            cards = [p for p in properties_list if p.get('property_id')]
+            if not cards:
+                await save_mhtml(page, f"extraction_failed_{slug}_pg{p_num}.mhtml")
+                raise ValueError(f"page {p_num} shows property cards but none could be read")
+            room = None if limit is None else limit - len(collected)
+            kept = cards[:room]
+            collected.extend(kept)
+
+            if db is None:
+                if home_type:
+                    for card in kept:
+                        card["home_types"] = [home_type]
+                log(f"Page {p_num}: kept {len(kept)} of {len(properties_list)} extracted properties for local output.")
+            else:
+                log(f"Extracted {len(properties_list)} exact matches; saving {len(kept)}. Checking Firestore for changes...")
+                seen_at = datetime.now(timezone.utc)
+                batch = db.batch()
+                batch_count = 0
+                unchanged_count = 0
+                new_ids = []
+                updated_ids = []
+                
+                for card in kept:
+                    pid = str(card['property_id'])
+                    doc_ref = db.collection(PROPERTIES).document(pid)
+                    doc_snapshot = await doc_ref.get()
+                    existing_data = doc_snapshot.to_dict() if doc_snapshot.exists else {}
+                    
+                    if not doc_snapshot.exists:
+                        new_ids.append(pid)
+                    elif card_changed(existing_data, card):
+                        updated_ids.append(pid)
+                    else:
+                        unchanged_count += 1
+                    # Always written: inventory.last_seen_at records every sighting
+                    batch.set(doc_ref, inventory_fields(card, existing_data, home_type, seen_at), merge=True)
+                    batch_count += 1
+                    
+                    if batch_count == 500:
+                        await batch.commit()
+                        batch = db.batch()
+                        batch_count = 0
+
+                if batch_count > 0:
+                    await batch.commit()
+                    
+                log(f"Page {p_num} Summary: {len(new_ids)} NEW, {len(updated_ids)} UPDATED, {unchanged_count} UNCHANGED.")
+                if updated_ids:
+                    log(f"   -> Updated IDs: {updated_ids}")
+                if new_ids:
+                    log(f"   -> New IDs: {new_ids}")
+
+            return next_page, state["shown"], len(kept)
 
         hit_limit = False
-        failed_pages = []
-        for index, page_num in enumerate(pages_to_scrape):
-            
-            # Sub-function to isolate per-page logic for timeout enforcement
-            async def scrape_single_page(p_num):
-                url = search_url(slug, filter_path, p_num)
-                log(f"\n--- Scraping Page {p_num} | {url} ---")
-                
-                page = await browser.get(url)
-                
-                log("Waiting for page load and bot protection clearance...")
-                page_ready = False
-                for _ in range(MAX_POLL_RETRIES): 
-                    has_data = await page.evaluate("!!document.querySelector('[data-testid=\"property-card\"]')")
-                    if has_data is True:
-                        page_ready = True
-                        break
-                    await asyncio.sleep(POLL_INTERVAL) 
-                
-                if not page_ready:
-                    log(f"Timeout: Could not find property data. Bot protection likely triggered or page is empty.")
-                    await save_mhtml(page, f"failed_bot_challenge_{slug}_pg{p_num}.mhtml")
-                    # Force a TimeoutError to trigger the browser restart block below
-                    raise asyncio.TimeoutError("Bot protection/empty page detected") 
-                
-                await asyncio.sleep(random.uniform(DELAY_HESITATION_MIN, DELAY_HESITATION_MAX)) 
-                
-                log("Scrolling page to trigger lazy loading...")
-                await smooth_scroll(page)
-                
-                log("Extracting payload from DOM...")
-                json_payload = await page.evaluate(js_extract_script)
-                properties_list = json.loads(json_payload) if json_payload else []
-
-                # Cards without a property_id can't be keyed; the limit counts what is kept
-                cards = [p for p in properties_list if p.get('property_id')]
-                room = None if limit is None else limit - len(collected)
-                kept = cards[:room]
-                collected.extend(kept)
-
-                if kept and db is None:
-                    if home_type:
-                        for card in kept:
-                            card["home_types"] = [home_type]
-                    log(f"Page {p_num}: kept {len(kept)} of {len(properties_list)} extracted properties for local output.")
-
-                elif kept:
-                    log(f"Extracted {len(properties_list)} exact matches; saving {len(kept)}. Checking Firestore for changes...")
-                    seen_at = datetime.now(timezone.utc)
-                    batch = db.batch()
-                    batch_count = 0
-                    unchanged_count = 0
-                    new_ids = []
-                    updated_ids = []
-
-                    for card in kept:
-                        pid = str(card['property_id'])
-                        doc_ref = db.collection(PROPERTIES).document(pid)
-                        doc_snapshot = await doc_ref.get()
-                        existing_data = doc_snapshot.to_dict() if doc_snapshot.exists else {}
-
-                        if not doc_snapshot.exists:
-                            new_ids.append(pid)
-                        elif card_changed(existing_data, card):
-                            updated_ids.append(pid)
-                        else:
-                            unchanged_count += 1
-                        # Always written: inventory.last_seen_at records every sighting
-                        batch.set(doc_ref, inventory_fields(card, existing_data, home_type, seen_at), merge=True)
-                        batch_count += 1
-
-                        if batch_count == 500:
-                            await batch.commit()
-                            batch = db.batch()
-                            batch_count = 0
-
-                    if batch_count > 0:
-                        await batch.commit()
-
-                    log(f"Page {p_num} Summary: {len(new_ids)} NEW, {len(updated_ids)} UPDATED, {unchanged_count} UNCHANGED.")
-                    if updated_ids:
-                        log(f"   -> Updated IDs: {updated_ids}")
-                    if new_ids:
-                        log(f"   -> New IDs: {new_ids}")
-
-                else:
-                    log("No exact matches found on this page. Saving snapshot.")
-                    await save_mhtml(page, f"extraction_failed_{slug}_pg{p_num}.mhtml")
-
+        failed_page = None
+        pages_done, collected_pass, shown = 0, 0, None
+        index = 0
+        page_num = explicit_pages[0] if explicit_pages else 1
+        while True:
             # Execute the page scrape with retry and restart logic
-            page_success = False
+            result = None
             for attempt in range(2):
                 try:
-                    await asyncio.wait_for(scrape_single_page(page_num), timeout=PAGE_TIMEOUT)
-                    page_success = True
+                    result = await asyncio.wait_for(scrape_single_page(page_num), timeout=T.page_timeout)
                     break # Success, break out of retry loop
                 except asyncio.TimeoutError:
                     if attempt == 0:
@@ -458,41 +418,63 @@ async def run_master_scraper(browser, target_slug, pages_str, rerun, collected, 
                             browser.stop()
                         except:
                             pass
-                        await asyncio.sleep(2) # Give process a moment to close
+                        await asyncio.sleep(T.restart_pause) # Give process a moment to close
                         
                         # Spin up fresh instance
                         browser = await start_browser()
                         log(f"Browser restarted. Retrying Page {page_num}...")
                     else:
-                        log(f"⚠️ TIMEOUT: Page {page_num} failed again after restart. Moving to next page.")
+                        log(f"⚠️ TIMEOUT: Page {page_num} failed again after restart.")
                 except Exception as e:
                     log(f"❌ ERROR processing page {page_num}: {e}")
                     break
 
-            if not page_success:
-                failed_pages.append(page_num)
+            if result is None:
+                # Later pages are only reachable through this page's Next link
+                failed_page = page_num
+                log(f"🛑 Stopping this search at page {page_num}.")
+                break
+
+            next_page, page_shown, kept_count = result
+            pages_done += 1
+            collected_pass += kept_count
+            if page_shown is not None:
+                shown = page_shown
+            log(f"Search so far: {pages_done} page(s), {collected_pass} properties"
+                + (f" of {shown} shown by realtor.com" if shown is not None else ""))
 
             if limit_reached(collected, limit):
                 log(f"Reached --limit of {limit} properties. Stopping.")
                 hit_limit = True
                 break
 
+            if explicit_pages is not None:
+                index += 1
+                if index == len(explicit_pages):
+                    break
+                page_num = explicit_pages[index]
+            elif next_page is None:
+                log(f"Page {page_num} has no Next link: last page.")
+                break
+            else:
+                page_num = next_page
+
             # Keep the spacing delay outside the timeout logic so we always throttle correctly
-            if index < len(pages_to_scrape) - 1 and page_success:
-                delay = random.uniform(DELAY_PAGE_MIN, DELAY_PAGE_MAX)
-                log(f"Graceful spacing: Waiting {delay:.2f} seconds before loading the next page...")
-                await asyncio.sleep(delay)
+            delay = wait(T.between_pages)
+            log(f"Graceful spacing: Waiting {delay:.2f} seconds before loading the next page...")
+            await asyncio.sleep(delay)
         
-        full_pass = pages_str is None and not hit_limit and not failed_pages
-        if log_ref and full_pass:
-            await log_ref.set({
-                "status": "completed",
-                "last_completed": firestore.SERVER_TIMESTAMP
-            }, merge=True)
-            log(f"🏁 Successfully recorded full pass for {log_key} in scrape_logs.")
-        elif log_ref:
-            reason = "--pages subset" if pages_str else "limit reached" if hit_limit else f"failed pages {failed_pages}"
-            log(f"⏸️ Partial pass for {log_key} ({reason}); not marked completed.")
+        counts = {"pages": pages_done, "collected": collected_pass, "results_shown": shown}
+        full_pass = explicit_pages is None and not hit_limit and failed_page is None
+        if full_pass:
+            log(f"🏁 Full pass for {log_key}: {pages_done} page(s), {collected_pass} properties"
+                + (f", realtor.com shows {shown}" if shown is not None else "") + ".")
+        else:
+            reason = "--pages subset" if explicit_pages is not None else "limit reached" if hit_limit else f"page {failed_page} failed"
+            log(f"⏸️ Partial pass for {log_key} ({reason}): {pages_done} page(s), {collected_pass} properties; not marked completed.")
+        if log_ref:
+            status = {"status": "completed", "last_completed": firestore.SERVER_TIMESTAMP} if full_pass else {"status": "in_progress"}
+            await log_ref.set({**status, **counts}, merge=True)
 
         return True, browser
                 
@@ -546,8 +528,8 @@ async def main_loop(location_ids, pages, rerun, output=None, limit=None, passes=
 
                     # Only pause between searches once we have actually hit the server
                     if scraped_location:
-                        log("Pausing 5s before the next search...")
-                        await asyncio.sleep(5)
+                        log(f"Pausing {T.between_searches}s before the next search...")
+                        await asyncio.sleep(T.between_searches)
 
                     # Capture the return value (and the browser, which may have been restarted)
                     was_scraped, browser = await run_master_scraper(
@@ -556,8 +538,8 @@ async def main_loop(location_ids, pages, rerun, output=None, limit=None, passes=
 
             # Apply the same logic to the group delay: only wait if we hit the server
             if loc_id != locations[-1] and scraped_location:
-                log(f"\nFinished location group {loc_id}. Pausing 10s before the next group...")
-                await asyncio.sleep(10)
+                log(f"\nFinished location group {loc_id}. Pausing {T.between_locations}s before the next group...")
+                await asyncio.sleep(T.between_locations)
 
     finally:
         browser.stop()
@@ -590,6 +572,8 @@ if __name__ == '__main__':
 
     if args.limit is not None and args.limit < 1:
         parser.error("--limit must be at least 1")
+    if args.pages is not None and not parse_page_ranges(args.pages):
+        parser.error("--pages has no page numbers")
 
     try:
         asyncio.run(main_loop(args.locations, args.pages, args.rerun, args.output, args.limit, passes))

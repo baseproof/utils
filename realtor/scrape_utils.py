@@ -1,15 +1,14 @@
 """Browser helpers shared by the inventory (main.py) and detail (details.py) stages."""
 import asyncio
-import random
 from datetime import datetime
 
 import nodriver as uc
 import nodriver.cdp.page as cdp_page
 from nodriver.core import util as uc_util
 
+from tuning import TUNING, wait
+
 BROWSER_ARGS = ["--password-store=basic", "--use-mock-keychain"]
-DELAY_SCROLL_MIN = 0.25
-DELAY_SCROLL_MAX = 0.75
 
 def log(msg):
     """Helper to print messages with a timestamp."""
@@ -18,15 +17,16 @@ def log(msg):
 
 async def start_browser():
     """Starts Chrome. nodriver gives a new Chrome under 3 seconds to answer, which a cold start
-    sometimes misses, so that one failure is retried once."""
+    sometimes misses, so that one failure is retried once. Start browsers one at a time."""
+    before = set(uc_util.get_registered_instances())
     try:
         return await uc.start(headless=False, browser_args=BROWSER_ARGS)
     except Exception as e:
         if "Failed to connect to browser" not in str(e):
             raise
-    # nodriver's stop() fails on a browser that never connected, so end that Chrome directly;
-    # it stays registered so nodriver still removes its temp profile at exit
-    for stale in uc_util.get_registered_instances():
+    # nodriver's stop() fails on a browser that never connected, so end the Chrome this call
+    # started directly; it stays registered so nodriver still removes its temp profile at exit
+    for stale in set(uc_util.get_registered_instances()) - before:
         proc = getattr(stale, "_process", None)
         if stale.info is None and proc is not None and proc.returncode is None:
             proc.terminate()
@@ -43,14 +43,14 @@ async def smooth_scroll(page):
         return
 
     while current_position < total_height:
-        scroll_step = random.randint(300, 700)
+        scroll_step = round(wait(TUNING.scroll.step_px))
         current_position += scroll_step
 
         if current_position > total_height:
             current_position = total_height
 
         await page.evaluate(f"window.scrollTo(0, {current_position});")
-        await asyncio.sleep(random.uniform(DELAY_SCROLL_MIN, DELAY_SCROLL_MAX))
+        await asyncio.sleep(wait(TUNING.scroll.step_pause))
 
         new_height = await page.evaluate(js_height_script)
         if isinstance(new_height, (int, float)):

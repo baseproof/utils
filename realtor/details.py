@@ -12,14 +12,15 @@ For each property:
   4. write detail.* on properties/{property_id}: the gs:// paths, captured_at, and the raw
      property details as provided (detail_record.py); interpreting them is post-processing
 
-The first property that fails stops the run, after saving the page under debug/ and recording
+Several workers can run at once (--workers, default in tuning.toml), each with its own browser,
+taking properties from one shared list so none is opened twice. The first failure stops every
+worker (each finishes the page it has open), after saving the page under debug/ and recording
 detail.last_error, so it can be looked at before anything else is captured.
 """
 import argparse
 import asyncio
 import json
 import os
-import random
 import sys
 from datetime import datetime, timezone
 
@@ -30,26 +31,18 @@ import detail_record
 from archive import Archive
 from scrape_utils import capture_mhtml, log, smooth_scroll, start_browser
 from settings import FIRESTORE_DB, GCP_PROJECT, PROPERTIES
+from tuning import TUNING, wait
 
-# ==========================================
-# 0. TIMING & DELAY CONSTANTS
-# ==========================================
-DELAY_HESITATION_MIN = 1.0
-DELAY_HESITATION_MAX = 2.5
-DELAY_EXPAND_SETTLE = 2.5        # price and tax history load when their accordions open
-DELAY_BETWEEN_PAGES_MIN = 3.0
-DELAY_BETWEEN_PAGES_MAX = 6.0
-RECORD_WAIT = 20                 # seconds to wait for the page's property record
-CAPTURE_TIMEOUT = 180.0          # max seconds per property
-
+T = TUNING.details
 DEBUG_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "debug")
 
 JS_NEXT_DATA = "(document.getElementById('__NEXT_DATA__') || {}).textContent || ''"
 
 # Opens every collapsed accordion, then clicks the "Show more" / "See more" buttons inside the
-# accordions and the description's. Buttons only, so nothing navigates away. Returns the click count.
+# accordions and the description's. Buttons only, so nothing navigates away. Called with the
+# pause between clicks in ms; returns the click count.
 JS_EXPAND = r"""
-(async () => {
+(async (pauseMs) => {
     const pause = ms => new Promise(r => setTimeout(r, ms));
     const label = el => (el.innerText || '').trim();
     let clicks = 0;
@@ -65,11 +58,11 @@ JS_EXPAND = r"""
         for (const el of todo) {
             el.click();
             clicks++;
-            await pause(600);
+            await pause(pauseMs);
         }
     }
     return clicks;
-})()
+})
 """
 
 # ==========================================
@@ -98,19 +91,18 @@ async def build_queue(db, limit, property_ids, recapture):
 async def capture(page, archive, doc_ref, property_id):
     """Archives the open page and writes its fields. Raises DetailPageError, before anything is
     stored, if the page is not this property's detail page."""
-    next_data = ""
-    for _ in range(RECORD_WAIT):
-        next_data = await page.evaluate(JS_NEXT_DATA)
-        if next_data:
-            break
+    next_data, waited = await page.evaluate(JS_NEXT_DATA), 0
+    while not next_data and waited < T.record_wait:
         await asyncio.sleep(1)
+        waited += 1
+        next_data = await page.evaluate(JS_NEXT_DATA)
     record = detail_record.property_record(next_data)
     detail_record.check_identity(record, property_id, await page.evaluate("location.pathname"))
 
-    await asyncio.sleep(random.uniform(DELAY_HESITATION_MIN, DELAY_HESITATION_MAX))
+    await asyncio.sleep(wait(T.hesitation))
     await smooth_scroll(page)
-    clicks = await page.evaluate(JS_EXPAND, await_promise=True)
-    await asyncio.sleep(DELAY_EXPAND_SETTLE)
+    clicks = await page.evaluate(f"{JS_EXPAND}({round(T.expand_click_pause * 1000)})", await_promise=True)
+    await asyncio.sleep(T.expand_settle)
     # Expanding only clicks buttons, but confirm the page is still this property before keeping it
     detail_record.check_identity(record, property_id, await page.evaluate("location.pathname"))
 
@@ -138,54 +130,76 @@ async def record_failure(page, doc_ref, property_id, error):
     await doc_ref.set({"detail": {"last_error": {"at": stamp, "reason": f"{type(error).__name__}: {error}"}}}, merge=True)
 
 # ==========================================
-# 3. ORCHESTRATION LOOP
+# 3. WORKERS
 # ==========================================
-async def run(limit, property_ids, recapture):
+class Progress:
+    def __init__(self, total):
+        self.total, self.started, self.captured, self.failed = total, 0, 0, None
+
+async def worker(name, browser, archive, todo, progress, stop):
+    """Captures properties from `todo` until it is empty or any worker has failed."""
+    while not stop.is_set():
+        try:
+            snap = todo.get_nowait()
+        except asyncio.QueueEmpty:
+            return
+        progress.started += 1
+        property_id, url = snap.id, snap.to_dict().get("full_url")
+        log(f"--- {name} [{progress.started}/{progress.total}] {property_id} | {url} ---")
+
+        page = None
+        try:
+            if not url:
+                raise detail_record.DetailPageError("the property has no full_url")
+            page = await browser.get(url)
+            uris, clicks = await asyncio.wait_for(capture(page, archive, snap.reference, property_id), timeout=T.capture_timeout)
+        except Exception as e:
+            stop.set()   # no worker starts another property
+            progress.failed = property_id
+            log(f"   🛑 {name} {property_id}: {type(e).__name__}: {e}")
+            await record_failure(page, snap.reference, property_id, e)
+            return
+
+        progress.captured += 1
+        log(f"   💾 {name} {property_id}: expanded {clicks} section(s) -> {uris['mhtml_uri']}")
+        if not todo.empty() and not stop.is_set():
+            await asyncio.sleep(wait(T.between_pages))
+
+async def run(limit, property_ids, recapture, workers):
     db = firestore.AsyncClient(project=GCP_PROJECT, database=FIRESTORE_DB)
     queue = await build_queue(db, limit, property_ids, recapture)
     if not queue:
         log("✅ No properties waiting for a detail capture.")
         return 0
 
-    archive = Archive()
-    log(f"🚀 Capturing {len(queue)} detail page(s)...")
-    browser = await start_browser()
-    captured = 0
+    workers = min(workers, len(queue))
+    todo: asyncio.Queue = asyncio.Queue()
+    for snap in queue:
+        todo.put_nowait(snap)
+    progress, stop = Progress(len(queue)), asyncio.Event()
+    log(f"🚀 Capturing {len(queue)} detail page(s) with {workers} worker(s)...")
+
+    browsers = []
     try:
-        for idx, snap in enumerate(queue):
-            property_id, url = snap.id, snap.to_dict().get("full_url")
-            log(f"\n--- [{idx + 1}/{len(queue)}] {property_id} | {url} ---")
-            if not url:
-                log(f"🛑 properties/{property_id} has no full_url; stopped after {captured} capture(s).")
-                return 1
-
-            page = None
-            try:
-                page = await browser.get(url)
-                uris, clicks = await asyncio.wait_for(capture(page, archive, snap.reference, property_id), timeout=CAPTURE_TIMEOUT)
-            except Exception as e:
-                log(f"   🛑 {type(e).__name__}: {e}")
-                await record_failure(page, snap.reference, property_id, e)
-                log(f"🛑 Stopped at {property_id} after {captured} capture(s); it stays queued for the next run.")
-                return 1
-
-            captured += 1
-            log(f"   🖱️  Expanded {clicks} section(s)")
-            log(f"   💾 {uris['mhtml_uri']}")
-
-            if idx < len(queue) - 1:
-                delay = random.uniform(DELAY_BETWEEN_PAGES_MIN, DELAY_BETWEEN_PAGES_MAX)
-                log(f"   ⏳ Waiting {delay:.2f}s before next property...")
-                await asyncio.sleep(delay)
+        for _ in range(workers):   # one at a time, see start_browser
+            browsers.append(await start_browser())
+        await asyncio.gather(*(worker(f"w{i + 1}", browser, Archive(), todo, progress, stop)
+                               for i, browser in enumerate(browsers)))
     finally:
-        browser.stop()
+        for browser in browsers:
+            browser.stop()
 
-    log(f"\n🏁 Captured {captured} detail page(s).")
+    if progress.failed:
+        log(f"\n🛑 Stopped after {progress.captured} capture(s): {progress.failed} failed and stays queued, "
+            f"as do the {todo.qsize()} not started.")
+        return 1
+    log(f"\n🏁 Captured {progress.captured} detail page(s).")
     return 0
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Realtor.com detail-page capture (Firestore queue -> GCS + Firestore)")
     parser.add_argument("--limit", type=int, default=50, help="Max properties to capture from the queue this run (default 50)")
+    parser.add_argument("--workers", type=int, default=T.workers, help=f"Browsers capturing in parallel (default {T.workers}, from tuning.toml)")
     parser.add_argument("--property-ids", type=str, default=None, help="Optional: Comma-separated property ids to capture instead of the queue")
     parser.add_argument("--recapture", action="store_true", help="With --property-ids: capture again even if already captured (adds a new capture)")
 
@@ -193,11 +207,13 @@ if __name__ == '__main__':
 
     if args.limit < 1:
         parser.error("--limit must be at least 1")
+    if args.workers < 1:
+        parser.error("--workers must be at least 1")
     if args.recapture and not args.property_ids:
         parser.error("--recapture requires --property-ids")
     ids = [p.strip() for p in args.property_ids.split(",") if p.strip()] if args.property_ids else []
 
     try:
-        sys.exit(asyncio.run(run(args.limit, ids, args.recapture)))
+        sys.exit(asyncio.run(run(args.limit, ids, args.recapture, args.workers)))
     except KeyboardInterrupt:
         log("\nStopped by user.")

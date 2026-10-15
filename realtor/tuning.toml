@@ -1,0 +1,29 @@
+# Waits and parallelism for the realtor scrapers. Edit and rerun: no code changes needed.
+# Seconds unless noted. A [min, max] pair means a random wait in that range each time.
+# Every key must be present; a missing, unknown or malformed key stops the script at start-up.
+
+[scroll]                      # smooth scrolling on any page (loads lazy content)
+step_px = [300, 700]          # pixels per scroll step
+step_pause = [0.25, 0.75]     # pause after each step
+
+[inventory]                   # main.py: search result pages
+hesitation = [1.0, 2.0]       # after the cards appear, before scrolling
+poll_interval = 1.0           # how often to look for the cards while a page loads
+poll_retries = 15             # looks before treating the page as blocked
+page_timeout = 180            # max per search page before restarting the browser
+restart_pause = 2             # after closing a stuck browser, before starting a new one
+between_pages = [4.0, 7.5]    # between search pages
+between_searches = 5          # between home-type passes and zip codes
+between_locations = 10        # between location groups
+
+[details]                     # details.py: detail pages
+workers = 3                   # browsers capturing in parallel (count; --workers overrides)
+record_wait = 20              # max wait for the page's property record
+hesitation = [1.0, 2.5]       # after the record appears, before scrolling
+expand_click_pause = 0.6      # between clicks while opening sections
+expand_settle = 2.5           # after opening sections (price and tax history load)
+capture_timeout = 180         # max per property
+between_pages = [3.0, 6.0]    # per worker, between properties
+
+[postprocess]                 # postprocess.py: no browser, only model calls
+concurrency = 8               # properties processed at once (count)
