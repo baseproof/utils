@@ -16,3 +16,4 @@ env/
 
 # macOS
 .DS_Store
+amazon_orders/html/versions/**/*.html
