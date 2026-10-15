@@ -1,15 +1,21 @@
+"""Inventory: search result pages -> properties in Firestore. Never opens a detail page.
+
+Every property found with a URL is queued for details.py (detail.mhtml_uri = null); field
+ownership per stage is listed in settings.py.
+"""
 import asyncio
 import json
 import random
 import os
 import sys
 import argparse
-from datetime import datetime
-import nodriver as uc
-import nodriver.cdp.page as cdp_page
+from datetime import datetime, timezone
 
 # Add the Google Cloud Firestore import
 from google.cloud import firestore
+
+from scrape_utils import capture_mhtml, log, smooth_scroll, start_browser
+from settings import FIRESTORE_DB, GCP_PROJECT, PROPERTIES, SCRAPE_LOGS
 
 # ==========================================
 # 0. TIMING & DELAY CONSTANTS (Configurable)
@@ -19,9 +25,7 @@ DELAY_PAGE_MIN = 4.0
 DELAY_PAGE_MAX = 7.5
 DELAY_HESITATION_MIN = 1.0
 DELAY_HESITATION_MAX = 2.0
-DELAY_SCROLL_MIN = 0.25
-DELAY_SCROLL_MAX = 0.75
-POLL_INTERVAL = 1.0        
+POLL_INTERVAL = 1.0
 MAX_POLL_RETRIES = 15      
 DELAY_DOM_SETTLE = 1.0     
 PAGE_TIMEOUT = 180.0       # Max seconds allowed per page scrape
@@ -34,10 +38,26 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 LOCATIONS_FILE = os.path.join(SCRIPT_DIR, "locations.json")
 BASE_URL = "https://www.realtor.com/realestateandhomes-search"
 
-def log(msg):
-    """Helper to print messages with a timestamp."""
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    print(f"[{timestamp}] {msg}")
+# Search filters, as the filter panel writes them into the URL path:
+#   .../Birmingham_AL/type-single-family-home,condo/shw-eh/pg-2
+# realtor.com silently ignores unknown codes and returns unfiltered results, so only
+# these names are accepted. Codes were confirmed against live search pages.
+HOME_TYPES = {                        # "Home type" (any number, comma-joined)
+    "house": "single-family-home",
+    "condo": "condo",
+    "townhome": "townhome",
+    "multi-family": "multi-family-home",
+    "mobile": "mfd-mobile-home",
+    "land": "land",
+    "farm": "farms-ranches",
+}
+LISTING_TYPES = {                     # "Listing details -> Type" (one only; "shw-eh,fc" is ignored)
+    "existing": "eh",
+    "foreclosure": "fc",
+    "new-construction": "nc",
+    "55-plus": "55p",
+    "auction": "au",
+}
 
 def load_locations():
     if not os.path.exists(LOCATIONS_FILE):
@@ -51,7 +71,7 @@ def load_locations():
 # ==========================================
 
 def parse_page_ranges(page_string):
-    pages = set()
+    pages: set[int] = set()
     for part in page_string.split(','):
         part = part.strip()
         if '-' in part:
@@ -64,43 +84,67 @@ def parse_page_ranges(page_string):
 def limit_reached(collected, limit):
     return limit is not None and len(collected) >= limit
 
+def build_filter_path(home_types, listing_type):
+    """Returns the filter path segments, e.g. 'type-single-family-home,condo/shw-eh', or ''."""
+    segments = []
+    if home_types:
+        segments.append("type-" + ",".join(HOME_TYPES[t] for t in home_types))
+    if listing_type:
+        segments.append("shw-" + LISTING_TYPES[listing_type])
+    return "/".join(segments)
+
+def search_url(slug, filter_path="", page_num=None):
+    parts = [BASE_URL, slug, filter_path, f"pg-{page_num}" if page_num else ""]
+    return "/".join(p for p in parts if p)
+
+def card_changed(existing, card):
+    """True if any card value differs from what is stored (fields other stages own are ignored)."""
+    for key, value in card.items():
+        if isinstance(value, dict) and isinstance(existing.get(key), dict):
+            if card_changed(existing[key], value):
+                return True
+        elif existing.get(key) != value:
+            return True
+    return False
+
+def inventory_fields(card, existing, home_type, seen_at):
+    """What inventory writes for one card (merged): the card plus inventory's own bookkeeping.
+    A property with a URL and no detail capture yet is queued with detail.mhtml_uri = null."""
+    fields = dict(card)
+    fields["inventory"] = {
+        "first_seen_at": (existing.get("inventory") or {}).get("first_seen_at") or seen_at,
+        "last_seen_at": seen_at,
+    }
+    if home_type:
+        fields["home_types"] = sorted(set(existing.get("home_types") or []) | {home_type})
+    if card.get("full_url") and "mhtml_uri" not in (existing.get("detail") or {}):
+        fields["detail"] = {"mhtml_uri": None, "captured_at": None}
+    return fields
+
+def merge_by_property(cards):
+    """One entry per property for --output; a property found by two type passes keeps both types."""
+    merged: dict[str, dict] = {}
+    for card in cards:
+        entry = merged.setdefault(card["property_id"], card)
+        if entry is not card:
+            entry["home_types"] = sorted(set(entry.get("home_types", [])) | set(card.get("home_types", [])))
+    return list(merged.values())
+
 async def save_mhtml(page, filename="error_page.mhtml"):
     try:
         log(f"--> Saving page state to {filename}...")
-        snapshot = await page.send(cdp_page.capture_snapshot(format="mhtml"))
+        snapshot = await capture_mhtml(page)
         with open(filename, "w", encoding="utf-8") as f:
-            f.write(snapshot.data)
+            f.write(snapshot)
     except Exception as e:
         log(f"--> Failed to save MHTML: {e}. Falling back to standard HTML...")
         html = await page.get_content()
         with open(filename.replace(".mhtml", ".html"), "w", encoding="utf-8") as f:
             f.write(html)
 
-async def smooth_scroll(page):
-    js_height_script = "document.body ? document.body.scrollHeight : 0"
-    total_height = await page.evaluate(js_height_script)
-    current_position = 0
-    
-    if not isinstance(total_height, (int, float)):
-        return
-        
-    while current_position < total_height:
-        scroll_step = random.randint(300, 700)
-        current_position += scroll_step
-        
-        if current_position > total_height:
-            current_position = total_height
-            
-        await page.evaluate(f"window.scrollTo(0, {current_position});")
-        await asyncio.sleep(random.uniform(DELAY_SCROLL_MIN, DELAY_SCROLL_MAX))
-        
-        new_height = await page.evaluate(js_height_script)
-        if isinstance(new_height, (int, float)):
-            total_height = new_height
-
-async def derive_total_pages(browser, slug):
+async def derive_total_pages(browser, slug, filter_path=""):
     """Visits base URL to verify results exist and extracts total pages based ONLY on exact matches."""
-    url = f"{BASE_URL}/{slug}"
+    url = search_url(slug, filter_path)
     log(f"🔍 Checking for results and determining total pages for {slug}...")
     
     page = await browser.get(url)
@@ -164,20 +208,22 @@ async def derive_total_pages(browser, slug):
 # 3. CORE SCRAPER LOGIC
 # ==========================================
 
-async def run_master_scraper(browser, target_slug, pages_str=None, rerun=False, collected=None, limit=None):
+async def run_master_scraper(browser, target_slug, pages_str, rerun, collected, limit, filter_path, home_type, db):
     """Main orchestration function relying on the globally passed browser.
 
-    When `collected` is a list, properties are appended to it and Firestore is
-    never touched. `limit` caps the size of `collected` and requires it.
+    Every kept card is appended to `collected`; `limit` caps its size. With `db` the cards are
+    written to Firestore; without it (--output) Firestore is never touched. `filter_path` (from
+    build_filter_path) narrows the search, and `home_type` is the one home type this pass
+    searches, recorded on every property it finds. Each pass is logged in scrape_logs under its
+    own key, and only a full pass (every page, limit not hit, no failed page) is marked completed.
     """
-    db = None if collected is not None else firestore.AsyncClient(project="legalai-460612", database="mls-list")
-
     if not target_slug:
         log("⚠️ Invalid target_slug provided. Skipping.")
         return False, browser
 
     slug = str(target_slug)
-    log_ref = db.collection("scrape_logs").document(slug) if db else None
+    log_key = f"{slug}__{filter_path.replace('/', '__')}" if filter_path else slug
+    log_ref = db.collection(SCRAPE_LOGS).document(log_key) if db else None
 
     if log_ref and not rerun:
         log_doc = await log_ref.get()
@@ -295,7 +341,7 @@ async def run_master_scraper(browser, target_slug, pages_str=None, rerun=False, 
         if pages_str:
             pages_to_scrape = parse_page_ranges(pages_str)
         else:
-            max_p = await derive_total_pages(browser, slug)
+            max_p = await derive_total_pages(browser, slug, filter_path)
             if max_p == 0:
                 log(f"⏭️ Skipping {slug} due to no exact results.")
                 if log_ref:
@@ -305,13 +351,16 @@ async def run_master_scraper(browser, target_slug, pages_str=None, rerun=False, 
             pages_to_scrape = list(range(1, max_p + 1))
             
         log(f"\nTargeting Location: {slug}")
+        log(f"Filters: {filter_path or 'none'}" + (f" (home type: {home_type})" if home_type else ""))
         log(f"Target Pages: {pages_to_scrape}")
 
+        hit_limit = False
+        failed_pages = []
         for index, page_num in enumerate(pages_to_scrape):
             
             # Sub-function to isolate per-page logic for timeout enforcement
             async def scrape_single_page(p_num):
-                url = f"{BASE_URL}/{slug}/pg-{p_num}"
+                url = search_url(slug, filter_path, p_num)
                 log(f"\n--- Scraping Page {p_num} | {url} ---")
                 
                 page = await browser.get(url)
@@ -340,49 +389,43 @@ async def run_master_scraper(browser, target_slug, pages_str=None, rerun=False, 
                 json_payload = await page.evaluate(js_extract_script)
                 properties_list = json.loads(json_payload) if json_payload else []
 
-                if properties_list and collected is not None:
-                    room = None if limit is None else limit - len(collected)
-                    kept = properties_list[:room]
-                    collected.extend(kept)
+                # Cards without a property_id can't be keyed; the limit counts what is kept
+                cards = [p for p in properties_list if p.get('property_id')]
+                room = None if limit is None else limit - len(collected)
+                kept = cards[:room]
+                collected.extend(kept)
+
+                if kept and db is None:
+                    if home_type:
+                        for card in kept:
+                            card["home_types"] = [home_type]
                     log(f"Page {p_num}: kept {len(kept)} of {len(properties_list)} extracted properties for local output.")
 
-                elif properties_list and db is not None:
-                    log(f"Extracted {len(properties_list)} exact matches. Checking Firestore for changes...")
+                elif kept:
+                    log(f"Extracted {len(properties_list)} exact matches; saving {len(kept)}. Checking Firestore for changes...")
+                    seen_at = datetime.now(timezone.utc)
                     batch = db.batch()
                     batch_count = 0
-                    new_count = 0
-                    updated_count = 0
                     unchanged_count = 0
                     new_ids = []
                     updated_ids = []
-                    
-                    for prop in properties_list:
-                        pid = str(prop.get('property_id') or prop.get('listing_id'))
-                        if not pid or pid == "None":
-                            continue
-                        
-                        doc_ref = db.collection("properties").document(pid)
+
+                    for card in kept:
+                        pid = str(card['property_id'])
+                        doc_ref = db.collection(PROPERTIES).document(pid)
                         doc_snapshot = await doc_ref.get()
-                        
-                        if doc_snapshot.exists:
-                            existing_data = doc_snapshot.to_dict()
-                            for key, value in existing_data.items():
-                                if key not in prop:
-                                    prop[key] = value
-                                    
-                            if existing_data == prop:
-                                unchanged_count += 1
-                            else:
-                                updated_count += 1
-                                updated_ids.append(pid)
-                                batch.set(doc_ref, prop, merge=True)
-                                batch_count += 1
-                        else:
-                            new_count += 1
+                        existing_data = doc_snapshot.to_dict() if doc_snapshot.exists else {}
+
+                        if not doc_snapshot.exists:
                             new_ids.append(pid)
-                            batch.set(doc_ref, prop, merge=True)
-                            batch_count += 1
-                        
+                        elif card_changed(existing_data, card):
+                            updated_ids.append(pid)
+                        else:
+                            unchanged_count += 1
+                        # Always written: inventory.last_seen_at records every sighting
+                        batch.set(doc_ref, inventory_fields(card, existing_data, home_type, seen_at), merge=True)
+                        batch_count += 1
+
                         if batch_count == 500:
                             await batch.commit()
                             batch = db.batch()
@@ -390,13 +433,13 @@ async def run_master_scraper(browser, target_slug, pages_str=None, rerun=False, 
 
                     if batch_count > 0:
                         await batch.commit()
-                        
-                    log(f"Page {p_num} Summary: {new_count} NEW, {updated_count} UPDATED, {unchanged_count} UNCHANGED.")
+
+                    log(f"Page {p_num} Summary: {len(new_ids)} NEW, {len(updated_ids)} UPDATED, {unchanged_count} UNCHANGED.")
                     if updated_ids:
                         log(f"   -> Updated IDs: {updated_ids}")
                     if new_ids:
                         log(f"   -> New IDs: {new_ids}")
-                    
+
                 else:
                     log("No exact matches found on this page. Saving snapshot.")
                     await save_mhtml(page, f"extraction_failed_{slug}_pg{p_num}.mhtml")
@@ -418,13 +461,7 @@ async def run_master_scraper(browser, target_slug, pages_str=None, rerun=False, 
                         await asyncio.sleep(2) # Give process a moment to close
                         
                         # Spin up fresh instance
-                        browser = await uc.start(
-                            headless=False,
-                            browser_args=[
-                                "--password-store=basic", 
-                                "--use-mock-keychain"
-                            ]
-                        )
+                        browser = await start_browser()
                         log(f"Browser restarted. Retrying Page {page_num}...")
                     else:
                         log(f"⚠️ TIMEOUT: Page {page_num} failed again after restart. Moving to next page.")
@@ -432,8 +469,12 @@ async def run_master_scraper(browser, target_slug, pages_str=None, rerun=False, 
                     log(f"❌ ERROR processing page {page_num}: {e}")
                     break
 
+            if not page_success:
+                failed_pages.append(page_num)
+
             if limit_reached(collected, limit):
                 log(f"Reached --limit of {limit} properties. Stopping.")
+                hit_limit = True
                 break
 
             # Keep the spacing delay outside the timeout logic so we always throttle correctly
@@ -442,13 +483,17 @@ async def run_master_scraper(browser, target_slug, pages_str=None, rerun=False, 
                 log(f"Graceful spacing: Waiting {delay:.2f} seconds before loading the next page...")
                 await asyncio.sleep(delay)
         
-        if log_ref:
+        full_pass = pages_str is None and not hit_limit and not failed_pages
+        if log_ref and full_pass:
             await log_ref.set({
                 "status": "completed",
                 "last_completed": firestore.SERVER_TIMESTAMP
             }, merge=True)
-            log(f"🏁 Successfully recorded full pass for {slug} in scrape_logs.")
-        
+            log(f"🏁 Successfully recorded full pass for {log_key} in scrape_logs.")
+        elif log_ref:
+            reason = "--pages subset" if pages_str else "limit reached" if hit_limit else f"failed pages {failed_pages}"
+            log(f"⏸️ Partial pass for {log_key} ({reason}); not marked completed.")
+
         return True, browser
                 
     except Exception as e:
@@ -459,72 +504,69 @@ async def run_master_scraper(browser, target_slug, pages_str=None, rerun=False, 
 # 4. ENTRY POINT
 # ==========================================
 
-async def main_loop(location_ids, pages, rerun, output=None, limit=None):
+async def main_loop(location_ids, pages, rerun, output=None, limit=None, passes=((None, ""),)):
+    """`passes` is a list of (home_type, filter_path): one search per home type, so every
+    property is tagged with the type that found it (or a single untyped pass)."""
     locations_mapping = load_locations()
     locations = [loc.strip() for loc in location_ids.split(',')]
-    collected: list[dict] | None = [] if output else None
+    collected: list[dict] = []
+    db = None if output else firestore.AsyncClient(project=GCP_PROJECT, database=FIRESTORE_DB)
 
     log("Starting master nodriver session...")
-    browser = await uc.start(
-        headless=False,
-        browser_args=[
-            "--password-store=basic", 
-            "--use-mock-keychain"
-        ]
-    )
-    
+    browser = await start_browser()
+
     try:
         for loc_id in locations:
             if limit_reached(collected, limit):
                 break
 
             location_data = locations_mapping.get(loc_id)
-            
+
             if not location_data:
                 log(f"Error: Location ID {loc_id} not found in locations.json.")
                 continue
-                
+
             log(f"\n{'='*40}")
             log(f"🚀 INITIATING SCRAPE FOR: {location_data.get('slug')} (ID: {loc_id})")
             log(f"{'='*40}\n")
-            
-            # Track if a scrape actually happened for the top-level location
-            scraped_location = False 
 
             if location_data.get('type') == 'ZipcodeList' and 'zipcodes' in location_data:
-                zip_list = location_data['zipcodes']
-                log(f"Found {len(zip_list)} zip codes. Processing sequentially...")
-                
-                for idx, zipcode in enumerate(zip_list):
+                slugs = location_data['zipcodes']
+                log(f"Found {len(slugs)} zip codes. Processing sequentially...")
+            else:
+                slugs = [location_data['slug']]
+
+            # Track if a scrape actually happened for the top-level location
+            scraped_location = False
+
+            for slug in slugs:
+                for home_type, filter_path in passes:
                     if limit_reached(collected, limit):
                         break
 
-                    log(f"\n>>> Target Zipcode: {zipcode} <<<")
+                    # Only pause between searches once we have actually hit the server
+                    if scraped_location:
+                        log("Pausing 5s before the next search...")
+                        await asyncio.sleep(5)
 
                     # Capture the return value (and the browser, which may have been restarted)
-                    was_scraped, browser = await run_master_scraper(browser, zipcode, pages, rerun, collected, limit)
-                    
-                    # Only pause if we actually scraped something
-                    if was_scraped and idx < len(zip_list) - 1:
-                        log("Pausing 5s before next ZIP code...")
-                        await asyncio.sleep(5)
-                        scraped_location = True # Mark that we hit the server at least once
-            
-            else:
-                scraped_location, browser = await run_master_scraper(browser, location_data['slug'], pages, rerun, collected, limit)
-            
+                    was_scraped, browser = await run_master_scraper(
+                        browser, slug, pages, rerun, collected, limit, filter_path=filter_path, home_type=home_type, db=db)
+                    scraped_location = scraped_location or was_scraped
+
             # Apply the same logic to the group delay: only wait if we hit the server
             if loc_id != locations[-1] and scraped_location:
                 log(f"\nFinished location group {loc_id}. Pausing 10s before the next group...")
                 await asyncio.sleep(10)
-                
+
     finally:
         browser.stop()
         log("\nAll scraping sessions complete. Master browser closed.")
-        if collected is not None:
+        if output:
+            merged = merge_by_property(collected)
             with open(output, "w", encoding="utf-8") as f:
-                json.dump(collected, f, indent=2)
-            log(f"Wrote {len(collected)} properties to {output}")
+                json.dump(merged, f, indent=2)
+            log(f"Wrote {len(merged)} properties to {output}")
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Realtor.com JSON Scraper (Nodriver Async)")
@@ -532,17 +574,24 @@ if __name__ == '__main__':
     parser.add_argument("--pages", type=str, required=False, default=None, help="Optional: Pages to scrape (e.g., '1, 2-6')")
     parser.add_argument("--rerun", action="store_true", help="Force rerun of previously completed locations")
     parser.add_argument("--output", type=str, required=False, default=None, help="Optional: Write properties to this local JSON file instead of Firestore (Firestore is not touched)")
-    parser.add_argument("--limit", type=int, required=False, default=None, help="Optional: Stop after this many properties (requires --output)")
+    parser.add_argument("--limit", type=int, required=False, default=None, help="Optional: Stop after this many properties (a capped pass is never marked completed)")
+    parser.add_argument("--home-types", type=str, required=False, default=None, help=f"Optional: Comma-separated home types, searched one at a time and recorded on each property ({', '.join(HOME_TYPES)})")
+    parser.add_argument("--listing-type", type=str, required=False, default=None, choices=list(LISTING_TYPES), help="Optional: One listing type (realtor.com accepts only one)")
 
     args = parser.parse_args()
 
-    # A capped run is a partial pass; it must never mark a location completed in scrape_logs
-    if args.limit is not None and not args.output:
-        parser.error("--limit requires --output")
+    home_types = [t.strip() for t in args.home_types.split(',')] if args.home_types else []
+    unknown = [t for t in home_types if t not in HOME_TYPES]
+    if unknown:
+        parser.error(f"unknown --home-types {unknown}; choose from: {', '.join(HOME_TYPES)}")
+    # One pass per home type: the type that found a property is its home type
+    passes = [(t, build_filter_path([t], args.listing_type)) for t in dict.fromkeys(home_types)] \
+        or [(None, build_filter_path([], args.listing_type))]
+
     if args.limit is not None and args.limit < 1:
         parser.error("--limit must be at least 1")
 
     try:
-        asyncio.run(main_loop(args.locations, args.pages, args.rerun, args.output, args.limit))
+        asyncio.run(main_loop(args.locations, args.pages, args.rerun, args.output, args.limit, passes))
     except KeyboardInterrupt:
         log("\nScraper forcefully stopped by user.")
