@@ -1,0 +1,332 @@
+[
+  {
+    "property_id": "8046604310",
+    "full_url": "https://www.realtor.com/realestateandhomes-detail/921-Village-Mill-Rd_Birmingham_AL_35215_M80466-04310",
+    "url_slug": "921-Village-Mill-Rd_Birmingham_AL_35215_M80466-04310",
+    "list_price": 294900,
+    "description": {
+      "beds": 4,
+      "baths": 4.5,
+      "sqft": 3657,
+      "lot_sqft": 14810
+    },
+    "location": {
+      "address": {
+        "line": "921 Village Mill Rd",
+        "city": "Birmingham",
+        "state_code": "AL",
+        "postal_code": "35215"
+      }
+    },
+    "status": "House for sale",
+    "broker": "Dream Home Realtors, Llc"
+  },
+  {
+    "property_id": "7107967420",
+    "full_url": "https://www.realtor.com/realestateandhomes-detail/2837-Bush-Blvd_Birmingham_AL_35208_M71079-67420",
+    "url_slug": "2837-Bush-Blvd_Birmingham_AL_35208_M71079-67420",
+    "list_price": 185000,
+    "description": {
+      "beds": 4,
+      "baths": 1.5,
+      "sqft": 3149,
+      "lot_sqft": 17424
+    },
+    "location": {
+      "address": {
+        "line": "2837 Bush Blvd",
+        "city": "Birmingham",
+        "state_code": "AL",
+        "postal_code": "35208"
+      }
+    },
+    "status": "Contingent",
+    "broker": "Real Broker LLC"
+  },
+  {
+    "property_id": "7153887285",
+    "full_url": "https://www.realtor.com/realestateandhomes-detail/9925-Miller-Ave_Birmingham_AL_35217_M71538-87285",
+    "url_slug": "9925-Miller-Ave_Birmingham_AL_35217_M71538-87285",
+    "list_price": 80000,
+    "description": {
+      "beds": 5,
+      "baths": 3,
+      "sqft": 3328,
+      "lot_sqft": 13068
+    },
+    "location": {
+      "address": {
+        "line": "9925 Miller Ave",
+        "city": "Birmingham",
+        "state_code": "AL",
+        "postal_code": "35217"
+      }
+    },
+    "status": "House for sale",
+    "broker": "Open Exchange Brokerage LLC"
+  },
+  {
+    "property_id": "7320111058",
+    "full_url": "https://www.realtor.com/realestateandhomes-detail/4241-Abingdon-Trl_Mountain-Brk_AL_35243_M73201-11058",
+    "url_slug": "4241-Abingdon-Trl_Mountain-Brk_AL_35243_M73201-11058",
+    "list_price": 4800000,
+    "description": {
+      "beds": 5,
+      "baths": 4.5,
+      "sqft": 8308,
+      "lot_sqft": 98010
+    },
+    "location": {
+      "address": {
+        "line": "4241 Abingdon Trl",
+        "city": "Mountain Brook",
+        "state_code": "AL",
+        "postal_code": "35243"
+      }
+    },
+    "status": "Coming Soon",
+    "broker": "Ray & Poynor Properties"
+  },
+  {
+    "property_id": "8471304660",
+    "full_url": "https://www.realtor.com/realestateandhomes-detail/54-Pine-Crest-Rd_Mountain-Brk_AL_35223_M84713-04660",
+    "url_slug": "54-Pine-Crest-Rd_Mountain-Brk_AL_35223_M84713-04660",
+    "list_price": 1495000,
+    "description": {
+      "beds": 3,
+      "baths": 2.5,
+      "sqft": 3031,
+      "lot_sqft": 12632
+    },
+    "location": {
+      "address": {
+        "line": "54 Pine Crest Rd",
+        "city": "Mountain Brook",
+        "state_code": "AL",
+        "postal_code": "35223"
+      }
+    },
+    "status": "Coming Soon",
+    "broker": "RealtySouth | Mtn. Brook Village"
+  },
+  {
+    "property_id": "8247370464",
+    "full_url": "https://www.realtor.com/realestateandhomes-detail/1636-35th-Ave-N_Birmingham_AL_35207_M82473-70464",
+    "url_slug": "1636-35th-Ave-N_Birmingham_AL_35207_M82473-70464",
+    "list_price": 44900,
+    "description": {
+      "beds": 3,
+      "baths": 2,
+      "sqft": 1190,
+      "lot_sqft": 14375
+    },
+    "location": {
+      "address": {
+        "line": "1636 35th Ave N",
+        "city": "Birmingham",
+        "state_code": "AL",
+        "postal_code": "35207"
+      }
+    },
+    "status": "House for sale",
+    "broker": "Alabama Realty Servicing Inc"
+  },
+  {
+    "property_id": "7420012827",
+    "full_url": "https://www.realtor.com/realestateandhomes-detail/1116-Westlake-Blvd_Bessemer_AL_35020_M74200-12827",
+    "url_slug": "1116-Westlake-Blvd_Bessemer_AL_35020_M74200-12827",
+    "list_price": 49900,
+    "description": {
+      "beds": 3,
+      "baths": 2.5,
+      "sqft": 1776,
+      "lot_sqft": 15246
+    },
+    "location": {
+      "address": {
+        "line": "1116 Westlake Blvd",
+        "city": "Bessemer",
+        "state_code": "AL",
+        "postal_code": "35020"
+      }
+    },
+    "status": "House for sale",
+    "broker": "Alabama Realty Servicing Inc"
+  },
+  {
+    "property_id": "8560725252",
+    "full_url": "https://www.realtor.com/realestateandhomes-detail/345-Orchid-Ln_Birmingham_AL_35215_M85607-25252",
+    "url_slug": "345-Orchid-Ln_Birmingham_AL_35215_M85607-25252",
+    "list_price": 159900,
+    "description": {
+      "beds": 4,
+      "baths": 2,
+      "sqft": 2212,
+      "lot_sqft": 15682
+    },
+    "location": {
+      "address": {
+        "line": "345 Orchid Ln",
+        "city": "Birmingham",
+        "state_code": "AL",
+        "postal_code": "35215"
+      }
+    },
+    "status": "Pending",
+    "broker": "Century 21 Advantage"
+  },
+  {
+    "property_id": "8274160824",
+    "full_url": "https://www.realtor.com/realestateandhomes-detail/557-Magnolia-Crest-Cir_Gardendale_AL_35071_M82741-60824",
+    "url_slug": "557-Magnolia-Crest-Cir_Gardendale_AL_35071_M82741-60824",
+    "list_price": 329900,
+    "description": {
+      "beds": 3,
+      "baths": 2,
+      "sqft": 1776,
+      "lot_sqft": null
+    },
+    "location": {
+      "address": {
+        "line": "557 Magnolia Crest Cir",
+        "city": "Gardendale",
+        "state_code": "AL",
+        "postal_code": "35071"
+      }
+    },
+    "status": "House for sale",
+    "broker": "Keller Williams Metro North"
+  },
+  {
+    "property_id": "7466671713",
+    "full_url": "https://www.realtor.com/realestateandhomes-detail/1444-Highland-Dr_Birmingham_AL_35235_M74666-71713",
+    "url_slug": "1444-Highland-Dr_Birmingham_AL_35235_M74666-71713",
+    "list_price": 159000,
+    "description": {
+      "beds": 4,
+      "baths": 3,
+      "sqft": 1804,
+      "lot_sqft": 15246
+    },
+    "location": {
+      "address": {
+        "line": "1444 Highland Dr",
+        "city": "Birmingham",
+        "state_code": "AL",
+        "postal_code": "35235"
+      }
+    },
+    "status": "House for sale",
+    "broker": "Keller Williams Realty-Jasper"
+  },
+  {
+    "property_id": "8370345596",
+    "full_url": "https://www.realtor.com/realestateandhomes-detail/1113-Harris-Ave_Birmingham_AL_35217_M83703-45596",
+    "url_slug": "1113-Harris-Ave_Birmingham_AL_35217_M83703-45596",
+    "list_price": 299000,
+    "description": {
+      "beds": 4,
+      "baths": 4.5,
+      "sqft": 4029,
+      "lot_sqft": 28314
+    },
+    "location": {
+      "address": {
+        "line": "1113 Harris Ave",
+        "city": "Birmingham",
+        "state_code": "AL",
+        "postal_code": "35217"
+      }
+    },
+    "status": "Contingent",
+    "broker": "Lah - Hoover Branch"
+  },
+  {
+    "property_id": "8451043360",
+    "full_url": "https://www.realtor.com/realestateandhomes-detail/825-Linwood-Rd_Birmingham_AL_35222_M84510-43360",
+    "url_slug": "825-Linwood-Rd_Birmingham_AL_35222_M84510-43360",
+    "list_price": 749900,
+    "description": {
+      "beds": 4,
+      "baths": 3.5,
+      "sqft": 3895,
+      "lot_sqft": 9583
+    },
+    "location": {
+      "address": {
+        "line": "825 Linwood Rd",
+        "city": "Birmingham",
+        "state_code": "AL",
+        "postal_code": "35222"
+      }
+    },
+    "status": "House for sale",
+    "broker": "RealtySouth | Mtn. Brook-Crestline"
+  },
+  {
+    "property_id": "7636455347",
+    "full_url": "https://www.realtor.com/realestateandhomes-detail/3432-Queenstown-Rd_Trussville_AL_35173_M76364-55347",
+    "url_slug": "3432-Queenstown-Rd_Trussville_AL_35173_M76364-55347",
+    "list_price": 350000,
+    "description": {
+      "beds": 4,
+      "baths": 3.5,
+      "sqft": 3879,
+      "lot_sqft": 261360
+    },
+    "location": {
+      "address": {
+        "line": "3432 Queenstown Rd",
+        "city": "Trussville",
+        "state_code": "AL",
+        "postal_code": "35173"
+      }
+    },
+    "status": "Contingent",
+    "broker": "Keller Williams Realty Vestavia"
+  },
+  {
+    "property_id": "8666957156",
+    "full_url": "https://www.realtor.com/realestateandhomes-detail/6609-Post-Oak-Dr_Hueytown_AL_35023_M86669-57156",
+    "url_slug": "6609-Post-Oak-Dr_Hueytown_AL_35023_M86669-57156",
+    "list_price": 250000,
+    "description": {
+      "beds": 3,
+      "baths": 3,
+      "sqft": 2952,
+      "lot_sqft": 29621
+    },
+    "location": {
+      "address": {
+        "line": "6609 Post Oak Dr",
+        "city": "Hueytown",
+        "state_code": "AL",
+        "postal_code": "35023"
+      }
+    },
+    "status": "House for sale",
+    "broker": "RE/MAX PREFERRED"
+  },
+  {
+    "property_id": "7288119210",
+    "full_url": "https://www.realtor.com/realestateandhomes-detail/911-Shelton-St_Birmingham_AL_35215_M72881-19210",
+    "url_slug": "911-Shelton-St_Birmingham_AL_35215_M72881-19210",
+    "list_price": 135000,
+    "description": {
+      "beds": 4,
+      "baths": 2,
+      "sqft": 1787,
+      "lot_sqft": 19166
+    },
+    "location": {
+      "address": {
+        "line": "911 Shelton St",
+        "city": "Birmingham",
+        "state_code": "AL",
+        "postal_code": "35215"
+      }
+    },
+    "status": "House for sale",
+    "broker": "eXp Realty, LLC Central"
+  }
+]
