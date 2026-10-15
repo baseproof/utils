@@ -20,14 +20,15 @@ test:
 
 deploy-hub: hubd
 	gcloud compute scp build/hubd $(VM):~ --zone=$(ZONE) --tunnel-through-iap
-	gcloud compute scp hub/hubd.service $(VM):~ --zone=$(ZONE) --tunnel-through-iap
-	gcloud compute ssh $(VM) --zone=$(ZONE) --tunnel-through-iap --command '\
-		sudo install -m755 ~/hubd /usr/local/bin/hubd && \
-		sudo install -m644 ~/hubd.service /etc/systemd/system/hubd.service && \
-		sudo mkdir -p /var/lib/hubd /etc/hubd && sudo chmod 700 /etc/hubd && \
-		sudo systemctl daemon-reload && \
-		sudo /usr/local/bin/hubd enroll-key && \
-		sudo systemctl enable --now hubd && sleep 3 && systemctl is-active hubd'
+	gcloud compute ssh $(VM) --zone=$(ZONE) --tunnel-through-iap --command 'set -e; \
+		if [ ! -f /etc/systemd/system/hubd.service ]; then \
+			echo "no hubd.service on $(VM) — the playbook owns it: run make hub-up" >&2; \
+			exit 1; \
+		fi; \
+		sudo install -m755 ~/hubd /usr/local/bin/hubd; \
+		sudo mkdir -p /var/lib/hubd /etc/hubd; sudo chmod 700 /etc/hubd; \
+		sudo /usr/local/bin/hubd enroll-key; \
+		sudo systemctl restart hubd; sleep 3; systemctl is-active hubd'
 
 clean:
 	rm -rf build

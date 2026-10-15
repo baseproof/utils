@@ -147,9 +147,32 @@ else
 fi
 rm -f "$STARTUP"
 
-# --can-ip-forward is not optional. Without it GCP silently drops any packet
-# whose destination is not the VM itself, so peer-to-peer traffic through the
-# hub disappears with no error anywhere.
+# --------------------------- 5b. it can actually reach out --------------------
+
+# The hub needs a public address in both directions: peers dial 51820 on it,
+# and it dials out to install itself. A VM with no accessConfig still answers
+# the metadata server, so it boots clean and looks alive on the console while
+# every package fetch times out and the startup script dies at exit 100.
+EXT="$(gcloud compute instances describe "$VM_NAME" --zone="$ZONE" \
+        --format='value(networkInterfaces[0].accessConfigs[0].natIP)')"
+if [[ -z "$EXT" ]]; then
+  die "$VM_NAME has no external IP: it cannot reach the internet and peers
+    cannot reach it. Attach the reserved address, then re-run:
+      gcloud compute instances add-access-config $VM_NAME --zone=$ZONE \\
+        --address=$HUB_IP
+    If it still cannot get out, infra/gcp-egress-check.sh explains why."
+elif [[ "$EXT" != "$HUB_IP" ]]; then
+  warn "$VM_NAME answers on $EXT, not the reserved $HUB_IP — DNS will be wrong"
+else
+  say "external address $EXT"
+fi
+
+FWD="$(gcloud compute instances describe "$VM_NAME" --zone="$ZONE" \
+        --format='value(canIpForward)')"
+[[ "$FWD" == "True" ]] \
+  || warn "canIpForward is off on $VM_NAME — peer-to-peer traffic will be
+    dropped with no error anywhere, and it cannot be set on a running
+    instance. The VM has to be recreated with --can-ip-forward."
 
 # --------------------------- 6. DNS ------------------------------------------
 
